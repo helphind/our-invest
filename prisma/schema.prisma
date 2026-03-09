@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Member {
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  phone    String? @unique
+  isActive Boolean @default(true)
+
+  userId    String? @unique
+  user      User?   @relation(fields: [userId], references: [id])
+
+  role     Role @default(MEMBER)
+  joinedAt DateTime   @default(now())
+
+  contributions Contribution[]
+  loans         Loan[]
+  transactions  Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([phone])
+  @@index([isActive])
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(MEMBER)
+  createdAt DateTime @default(now())
+
+  member   Member?
+}
+
+model Contribution {
+  id       String  @id @default(uuid())
+  memberId String
+  amount   Decimal @db.Decimal(12, 2)
+
+  // Store as first day of month (e.g., 2026-02-01)
+  month  DateTime
+  status ContributionStatus @default(PENDING)
+
+  member       Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([memberId, month]) // Prevent duplicate monthly contribution
+  @@index([memberId])
+  @@index([month])
+}
+
+model Loan {
+  id              String  @id @default(uuid())
+  memberId        String
+  principal       Decimal @db.Decimal(14, 2)
+  interestRate    Decimal @db.Decimal(5, 2)
+  totalAmount     Decimal @db.Decimal(14, 2)
+  remainingAmount Decimal @db.Decimal(14, 2)
+
+  durationMonths Int
+  loanType LoanType @default(NORMAL)
+  startDate      DateTime   @default(now())
+  status         LoanStatus @default(ACTIVE)
+
+  member       Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  emi          EMI[]
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([memberId])
+  @@index([status])
+}
+
+model EMI {
+  id            String  @id @default(uuid())
+  loanId        String
+  installmentNo Int
+  amount        Decimal @db.Decimal(12, 2)
+
+  dueDate  DateTime
+  paidDate DateTime?
+  status   EMIStatus @default(PENDING)
+
+  loan Loan @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([loanId, installmentNo])
+  @@index([loanId])
+  @@index([status])
+}
+
+model Transaction {
+  id String @id @default(uuid())
+
+  memberId       String
+  loanId         String?
+  contributionId String?
+
+  type   TransactionType
+  amount Decimal         @db.Decimal(14, 2)
+  note   String?
+
+  member       Member        @relation(fields: [memberId], references: [id])
+  loan         Loan?         @relation(fields: [loanId], references: [id])
+  contribution Contribution? @relation(fields: [contributionId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+  @@index([loanId])
+  @@index([contributionId])
+  @@index([type])
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum ContributionStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+enum LoanStatus {
+  ACTIVE
+  CLOSED
+  HOLD
+}
+
+enum EMIStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+enum TransactionType {
+  CONTRIBUTION
+  EMI_PAYMENT
+  REFUND
+}
+
+
+enum LoanType {
+  NORMAL
+  INSTANT  
+}
