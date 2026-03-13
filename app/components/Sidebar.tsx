@@ -17,6 +17,13 @@ export default function Sidebar() {
                 <Link href="/loans" className="block hover:text-blue-600">
                     Loans
                 </Link>
+                <Link href="/contributions" className="block hover:text-blue-600">
+                    Contributions
+                </Link>
+                
+                <Link href="/emi-calculator" className="block hover:text-blue-600">
+                    EMI Calculator
+                </Link>
             </nav>
         </div>
     );

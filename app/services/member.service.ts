@@ -1,7 +1,13 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getAllMembers() {
-    return await prisma.member.findMany();
+    return await prisma.member.findMany(
+        {
+            orderBy: {
+                name: "asc",
+            },
+        }
+    );
 }
 
 export async function getAllActiveMembers() {

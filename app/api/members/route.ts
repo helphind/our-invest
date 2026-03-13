@@ -34,9 +34,10 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
-  const members = await prisma.member.findMany({
-    where: { isActive: true }
-  });
+    const members = await prisma.member.findMany({
+        where: { isActive: true },
+    });
 
-  return NextResponse.json(members);
+    return NextResponse.json(members);
 }
+

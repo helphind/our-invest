@@ -30,6 +30,10 @@ export default function LoginPage() {
             password,
             redirect: true,
             callbackUrl: "/",
+            session: {
+                strategy: "jwt",
+                maxAge: 60 * 60 * 8, // 8 hours
+            },
         });
     };
 

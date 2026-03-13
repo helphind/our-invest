@@ -17,12 +17,13 @@ model Member {
   userId    String? @unique
   user      User?   @relation(fields: [userId], references: [id])
 
-  role     Role @default(MEMBER)
   joinedAt DateTime   @default(now())
 
   contributions Contribution[]
   loans         Loan[]
   transactions  Transaction[]
+  approvals     LoanApproval[]
+  LoanRequest   LoanRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -130,6 +131,33 @@ model Transaction {
   @@index([type])
 }
 
+model LoanRequest {
+  id        String   @id @default(uuid())
+  fundId    String
+  memberId  String
+  amount    Decimal
+  reason    String?
+  status    LoanStatus @default(PENDING)
+
+  approvals LoanApproval[]
+  member    Member     @relation(fields: [memberId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model LoanApproval {
+  id        String   @id @default(uuid())
+  loanRequestId    String
+  memberId  String
+  approved  Boolean
+  createdAt DateTime @default(now())
+
+  loan      LoanRequest   @relation(fields: [loanRequestId], references: [id])
+  member    Member @relation(fields: [memberId], references: [id])
+
+  @@unique([loanRequestId, memberId])
+}
+
 enum Role {
   ADMIN
   MEMBER
@@ -145,6 +173,11 @@ enum LoanStatus {
   ACTIVE
   CLOSED
   HOLD
+  PENDING
+  APPROVED
+  REJECTED
+  DISBURSED
+  REPAID
 }
 
 enum EMIStatus {

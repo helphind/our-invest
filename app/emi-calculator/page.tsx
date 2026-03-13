@@ -1,0 +1,149 @@
+"use client";
+import { useState } from "react";
+
+export default function EmiCalculator() {
+    const [amount, setAmount] = useState(500000);
+    const [interest, setInterest] = useState(8);
+    const [tenure, setTenure] = useState(60);
+    const [emi, setEmi] = useState(null);
+    const [schedule, setSchedule] = useState([]);
+
+    const currency = new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+    });
+
+    const calculate = () => {
+        const P = Number(amount);
+        const r = Number(interest) / 12 / 100;
+        const n = Number(tenure);
+
+        const emiValue =
+            (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+
+        setEmi(emiValue.toFixed(2));
+
+        let balance = P;
+        const rows = [];
+
+        for (let i = 1; i <= n; i++) {
+            const interestAmount = balance * r;
+            const principal = emiValue - interestAmount;
+
+            balance -= principal;
+
+            rows.push({
+                month: i,
+                emi: emiValue.toFixed(2),
+                principal: principal.toFixed(2),
+                interest: interestAmount.toFixed(2),
+                balance: balance > 0 ? balance.toFixed(2) : 0,
+            });
+        }
+
+        setSchedule(rows);
+    };
+
+    return (
+        <div className="max-w-5xl mx-auto p-6 space-y-8">
+            <h1 className="text-2xl font-bold">EMI Calculator</h1>
+
+            {/* FORM */}
+            <div className="bg-white shadow rounded-xl p-6 grid md:grid-cols-3 gap-4">
+                <input
+                    type="number"
+                    placeholder="Loan Amount"
+                    className="border p-2 rounded-lg"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                />
+
+                <input
+                    type="number"
+                    placeholder="Interest %"
+                    className="border p-2 rounded-lg"
+                    value={interest}
+                    onChange={(e) => setInterest(e.target.value)}
+                />
+
+                <input
+                    type="number"
+                    placeholder="Tenure (months)"
+                    className="border p-2 rounded-lg"
+                    value={tenure}
+                    onChange={(e) => setTenure(e.target.value)}
+                />
+
+                <button
+                    onClick={calculate}
+                    className="bg-blue-600 text-white py-2 rounded-lg col-span-3 hover:bg-blue-700"
+                >
+                    Calculate EMI
+                </button>
+            </div>
+
+            {/* RESULT */}
+            {emi && (
+                <div className="grid md:grid-cols-3 gap-4">
+                    <div className="bg-blue-50 p-5 rounded-xl">
+                        <p className="text-gray-500 text-sm">Monthly EMI</p>
+                        <p className="text-2xl font-bold text-blue-600">
+                            {currency.format(emi)}
+                        </p>
+                    </div>
+
+                    <div className="bg-orange-50 p-5 rounded-xl">
+                        <p className="text-gray-500 text-sm">Total Interest</p>
+                        <p className="text-2xl font-bold text-orange-600">
+                            {currency.format(emi * tenure - amount)}
+                        </p>
+                    </div>
+
+                    <div className="bg-green-50 p-5 rounded-xl">
+                        <p className="text-gray-500 text-sm">Total Payment</p>
+                        <p className="text-2xl font-bold text-green-600">
+                            {currency.format(emi * tenure)}
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* SCHEDULE */}
+            {schedule.length > 0 && (
+                <div className="bg-white shadow rounded-xl p-6">
+                    <h2 className="text-lg font-semibold mb-4">
+                        Repayment Schedule
+                    </h2>
+
+                    <div className="overflow-auto">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b text-left">
+                                    <th className="py-2">Month</th>
+                                    <th>EMI</th>
+                                    <th>Principal</th>
+                                    <th>Interest</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {schedule.map((row) => (
+                                    <tr key={row.month} className="border-b">
+                                        <td className="py-2">{row.month}</td>
+                                        <td>{currency.format(row.emi)}</td>
+                                        <td>
+                                            {currency.format(row.principal)}
+                                        </td>
+                                        <td>{currency.format(row.interest)}</td>
+                                        <td>{currency.format(row.balance)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

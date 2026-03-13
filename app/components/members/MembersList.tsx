@@ -1,8 +1,38 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 export default function MembersList({ members }: { members: any[] }) {
+
+    const router = useRouter();
+
+    const handleDelete = async (id: string) => {
+        const confirmed = confirm(
+            "Are you sure you want to delete this member?",
+        );
+
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch(`/api/members/${id}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to delete member");               
+            }
+
+            toast.success("Member deleted successfully");
+
+            router.refresh();
+        } catch (error) {
+            console.error("Failed to delete member:", error);
+            toast.error("Failed to delete member");
+        }
+    };
+
     return (
         <div>
             <div className="header flex">
@@ -35,10 +65,10 @@ export default function MembersList({ members }: { members: any[] }) {
                                 <td className="p-4">
                                     {m.isActive ? "Active" : "Inactive"}
                                 </td>
-                                <td className="p-4">
+                                <td className="p-4 flex gap-2">
                                     <Link
                                         href={`/members/${m.id}`}
-                                        className="mx-2 px-4 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+                                        className="px-4 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
                                     >
                                         View
                                     </Link>
@@ -49,6 +79,13 @@ export default function MembersList({ members }: { members: any[] }) {
                                     >
                                         Edit
                                     </Link>
+
+                                    <button
+                                        onClick={() => handleDelete(m.id)}
+                                        className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"                                        
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))}
