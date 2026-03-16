@@ -55,21 +55,13 @@ export default async function DashboardPage() {
                     value={amountOnHold}
                     type="pending"
                 />
-                <StatCard
-                    title="Available Amount for Loans"
-                    value={availableAmountForLoans}
-                    type="loans"
+                
+               <StatCard
+                    title="Amount OnHold"
+                    value={amountOnHold}
+                    type="pending"
                 />
-                <StatCard
-                    title="Active Members"
-                    value={activeMembers}
-                    type="membersActive"
-                />
-                <StatCard
-                    title="Total Members"
-                    value={allMembers}
-                    type="membersTotal"
-                />
+                
                 <StatCard
                     title="Active Loans"
                     value={activeLoans}
@@ -79,6 +71,28 @@ export default async function DashboardPage() {
                     title="Active Instant Loans"
                     value={instantLoans}
                     type="loans"
+                />
+
+                <StatCard
+                    title="Available Amount for Loans"
+                    value={availableAmountForLoans}
+                    type="loans"
+                />
+
+                 <StatCard
+                    title="Active Members"
+                    value={activeMembers}
+                    type="membersActive"
+                />
+                  <StatCard
+                    title="InActive Members"
+                    value={allMembers - activeMembers}
+                    type="membersInActive"
+                />
+                <StatCard
+                    title="Total Members"
+                    value={allMembers}
+                    type="membersTotal"
                 />
             </div>
         </div>

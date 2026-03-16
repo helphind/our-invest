@@ -17,6 +17,7 @@ export async function getAllLoans() {
         interestRate: Number(loan.interestRate),
         totalAmount: Number(loan.totalAmount),
         remainingAmount: Number(loan.remainingAmount),
+        emiAmount: Number(loan.emiAmount),
     }));
 }
 

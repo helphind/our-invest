@@ -9,6 +9,11 @@ const styles = {
         accent: "border-blue-500",
         icon: "👥",
     },
+    membersInActive: {
+        iconBg: "from-gray-500 to-gray-600",
+        accent: "border-gray-500",
+        icon: "👥",
+    },
     loans: {
         iconBg: "from-green-500 to-green-600",
         accent: "border-green-500",

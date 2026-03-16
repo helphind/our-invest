@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import LinkBtn from "../ui/LinkBtn";
 
 export default function MembersList({ members }: { members: any[] }) {
 
@@ -36,13 +37,8 @@ export default function MembersList({ members }: { members: any[] }) {
     return (
         <div>
             <div className="header flex">
-                <h2 className="text-2xl font-bold mb-6">Members</h2>
-                <Link
-                    href="/members/add"
-                    className="block ml-auto btn bt-primary hover:text-blue-600"
-                >
-                    Add
-                </Link>
+                <h2 className="text-2xl font-bold mb-6">Members</h2>             
+                <LinkBtn href="/members/add">Add</LinkBtn>
             </div>
 
             <div className="bg-white rounded-xl shadow overflow-hidden">

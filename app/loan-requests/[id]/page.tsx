@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function LoansPage() {
+export default function EditLoanRequestPage({ params }: { id: string }) {
+    const [id, setId] = useState("");
     const [amount, setAmount] = useState(500000);
     const [duration, setDuration] = useState(60);
     const [loading, setLoading] = useState(false);
@@ -20,8 +21,9 @@ export default function LoansPage() {
         setLoading(true);
 
         const res = await fetch("/api/loans", {
-            method: "POST",
+            method: "PUT",
             body: JSON.stringify({
+                id,
                 memberId,
                 amount: +amount,
                 duration: +duration,
@@ -48,11 +50,28 @@ export default function LoansPage() {
         }
 
         loadMembers();
-    }, []);
+
+        const loadLoanDetails = async () => {
+            const { id } = await params;
+
+            setLoading(true);
+            const res = await fetch(`/api/loans/${id}`);
+            const data = await res.json();
+
+            setId(data.id);
+            setAmount(data.principal);
+            setDuration(data.durationMonths);
+            setMemberId(data.memberId);
+            setLoanType(data.loanType);
+            setLoading(false);
+        };
+
+        loadLoanDetails();
+    }, [params]);
 
     return (
         <div>
-            <h2 className="text-2xl font-bold mb-6">Request Loan</h2>
+            <h2 className="text-2xl font-bold mb-6">Loan Request</h2>
             {loading && <Loader />}
             <form onSubmit={loanRequest}>
                 <div className="bg-white p-6 rounded-xl shadow max-w-md">

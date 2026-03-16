@@ -4,31 +4,10 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
     try {
         const loanRequestData = await request.json();
-        console.log("Received loan request data:", loanRequestData);
-
-        const memberId = loanRequestData.memberId;
-        const durationMonths = loanRequestData.duration;
-        const principal = parseFloat(loanRequestData.amount);
-        const loanType = loanRequestData.loanType;
-
-        let interestRate = 8.0;
-        if(loanType === "INSTANT") {
-            interestRate = 12.0; // Higher interest rate for instant loans
-        }
-        
-        const interest = (principal * interestRate) / 100;
-        const totalAmount = principal + interest;
-        const remainingAmount = totalAmount;
+        const formattedData = getDataFromRequest(loanRequestData);
 
         const loan = await prisma.loan.create({
-            data: {
-                memberId,
-                durationMonths,
-                principal,
-                interestRate,
-                totalAmount,
-                remainingAmount,
-            },
+            data: formattedData,
         });
 
         return NextResponse.json({
@@ -50,33 +29,13 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
     try {
         const loanRequestData = await request.json();
-        console.log("Received loan request data:", loanRequestData);
-
         const id = loanRequestData.id;
-        const memberId = loanRequestData.memberId;
-        const durationMonths = loanRequestData.duration;
-        const principal = parseFloat(loanRequestData.amount);
-        const loanType = loanRequestData.loanType;
-
-        let interestRate = 8.0;
-        if(loanType === "INSTANT") {
-            interestRate = 12.0; // Higher interest rate for instant loans
-        }
-        
-        const interest = (principal * interestRate) / 100;
-        const totalAmount = principal + interest;
-        const remainingAmount = totalAmount;
+        const formattedData = getDataFromRequest(loanRequestData);
+        console.log("Received loan request data:", formattedData);
 
         const loan = await prisma.loan.update({
             where: { id },
-            data: {
-                memberId,
-                durationMonths,
-                principal,
-                interestRate,
-                totalAmount,
-                remainingAmount,
-            },
+            data: formattedData,
         });
 
         return NextResponse.json({
@@ -93,4 +52,42 @@ export async function PUT(request: Request) {
             { status: 500 },
         );
     }
+}
+
+function getDataFromRequest(loanRequestData: any) {
+    console.log("Received loan request data:", loanRequestData);
+
+    const memberId = loanRequestData.memberId;
+    const durationMonths = loanRequestData.duration;
+    const principal = parseFloat(loanRequestData.amount);
+    const loanType = loanRequestData.loanType;
+    const emiStartMonth =  loanRequestData.emiStartMonth
+
+    const startDate = new Date(`${emiStartMonth}-01`);
+
+    let interestRate = 8.0;
+    if (loanType === "INSTANT") {
+        interestRate = 12.0; // Higher interest rate for instant loans
+    }
+
+    const monthlyRate = interestRate / 100 / 12;
+
+    const emiAmount =
+        (principal * monthlyRate * Math.pow(1 + monthlyRate, durationMonths)) /
+        (Math.pow(1 + monthlyRate, durationMonths) - 1);
+
+    const totalAmount = emiAmount * durationMonths;
+
+    const remainingAmount = totalAmount;
+
+    return {
+        memberId,
+        durationMonths,
+        principal,
+        interestRate,
+        totalAmount,
+        remainingAmount,
+        emiAmount,
+        startDate
+    };
 }

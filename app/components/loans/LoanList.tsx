@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import LinkBtn from "../ui/LinkBtn";
 
 export default function LoanList({ loans }: { loans: any[] }) {
-
     const router = useRouter();
 
-     const handleDelete = async (id: string) => {
+    const handleDelete = async (id: string) => {
         const confirmed = confirm(
             "Are you sure you want to delete this Loan Request?",
         );
@@ -21,9 +21,9 @@ export default function LoanList({ loans }: { loans: any[] }) {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to delete loan request");               
+                throw new Error("Failed to delete loan request");
             }
-            
+
             toast.success("Loan request deleted successfully");
 
             router.refresh();
@@ -37,12 +37,8 @@ export default function LoanList({ loans }: { loans: any[] }) {
         <div>
             <div className="header flex">
                 <h2 className="text-2xl font-bold mb-6">Loans</h2>
-                <Link
-                    href="/loans/request"
-                    className="block ml-auto btn bt-primary hover:text-blue-600"
-                >
-                    Request Loan
-                </Link>
+
+                <LinkBtn href="/loans/create">Create Loan</LinkBtn>
             </div>
 
             <div className="bg-white rounded-xl shadow overflow-hidden">
@@ -52,7 +48,9 @@ export default function LoanList({ loans }: { loans: any[] }) {
                             <th className="p-4 text-left">Name</th>
                             <th className="p-4 text-left">Principal</th>
                             <th className="p-4 text-left">InterestRate</th>
-                            <th className="p-4 text-left">Duration (In Months)</th>
+                            <th className="p-4 text-left">
+                                Duration (In Months)
+                            </th>
                             <th className="p-4 text-left">TotalAmount</th>
                             <th className="p-4 text-left">Status</th>
                             <th className="p-4 text-left">Action</th>
@@ -84,7 +82,7 @@ export default function LoanList({ loans }: { loans: any[] }) {
 
                                     <button
                                         onClick={() => handleDelete(loan.id)}
-                                        className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"                                        
+                                        className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
                                     >
                                         Delete
                                     </button>

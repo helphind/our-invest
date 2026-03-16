@@ -1,21 +1,16 @@
 "use client";
 
 import Loader from "@/app/components/ui/Loader";
-import { monthFieldValue } from "@/app/services/utility.service";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function EditLoanPage({ params }: { id: string }) {
-    const [id, setId] = useState("");
-    const [amount, setAmount] = useState(500000);
-    const [duration, setDuration] = useState(60);
-    const [loading, setLoading] = useState(false);
+export default function LoansPage() {
     const [memberId, setMemberId] = useState("");
+    const [amount, setAmount] = useState(500000);
+
     const [loanType, setLoanType] = useState("NORMAL");
-    const [emiStartMonth, setEmiStartMonth] = useState(
-        new Date().toISOString().slice(0, 7),
-    );
+    const [loading, setLoading] = useState(false);
     const [members, setMembers] = useState([]);
 
     const router = useRouter();
@@ -24,15 +19,12 @@ export default function EditLoanPage({ params }: { id: string }) {
         e.preventDefault();
         setLoading(true);
 
-        const res = await fetch("/api/loans", {
-            method: "PUT",
+        const res = await fetch("/api/loan-request", {
+            method: "POST",
             body: JSON.stringify({
-                id,
                 memberId,
                 amount: +amount,
-                duration: +duration,
                 loanType,
-                emiStartMonth,
             }),
         });
 
@@ -40,9 +32,8 @@ export default function EditLoanPage({ params }: { id: string }) {
 
         if (res.ok) {
             toast.success("Loan request created successfully");
-            router.push("/loans");
+            router.push("/loan-requests");
         } else {
-            console.error("Loan request failed");
             toast.error("Failed to create loan request");
         }
     };
@@ -55,33 +46,11 @@ export default function EditLoanPage({ params }: { id: string }) {
         }
 
         loadMembers();
-
-        const loadLoanDetails = async () => {
-            const { id } = await params;
-
-            setLoading(true);
-            const res = await fetch(`/api/loans/${id}`);
-            const data = await res.json();
-
-            console.log("data", data);
-
-            const startDate = monthFieldValue(data.startDate);
-
-            setId(data.id);
-            setAmount(data.principal);
-            setDuration(data.durationMonths);
-            setMemberId(data.memberId);
-            setLoanType(data.loanType);
-            setEmiStartMonth(startDate);
-            setLoading(false);
-        };
-
-        loadLoanDetails();
-    }, [params]);
+    }, []);
 
     return (
         <div>
-            <h2 className="text-2xl font-bold mb-6">Loan Request Details</h2>
+            <h2 className="text-2xl font-bold mb-6">Loan Request</h2>
             {loading && <Loader />}
             <form onSubmit={loanRequest}>
                 <div className="bg-white p-6 rounded-xl shadow max-w-md">
@@ -112,18 +81,6 @@ export default function EditLoanPage({ params }: { id: string }) {
                     </div>
 
                     <div className="mb-4">
-                        <label className="block mb-2">
-                            Duration (In Months)
-                        </label>
-                        <input
-                            type="number"
-                            value={duration}
-                            onChange={(e) => setDuration(e.target.value)}
-                            className="w-full border rounded-lg p-2"
-                        />
-                    </div>
-
-                    <div className="mb-4">
                         <label className="block mb-2">Loan Type</label>
                         <select
                             className="w-full border rounded-lg p-2"
@@ -134,22 +91,6 @@ export default function EditLoanPage({ params }: { id: string }) {
                             <option value="INSTANT">Instant Loan</option>
                         </select>
                     </div>
-
-                    {loanType === "NORMAL" && (
-                        <div className="mb-4">
-                            <label className="block mb-2">
-                                EMI Start Month
-                            </label>
-                            <input
-                                type="month"
-                                value={emiStartMonth}
-                                onChange={(e) =>
-                                    setEmiStartMonth(e.target.value)
-                                }
-                                className="w-full border rounded-lg p-2"
-                            />
-                        </div>
-                    )}
 
                     <button
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg"

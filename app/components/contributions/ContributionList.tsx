@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import LinkBtn from "../ui/LinkBtn";
+import { formatMonth } from "@/app/services/utility.service";
 
 export default function ContributionList({
     contributions,
@@ -13,12 +15,7 @@ export default function ContributionList({
 }) {
     const router = useRouter();
 
-    const formatMonth = (date: Date) => {
-        return new Date(date).toLocaleString("en-US", {
-            month: "long",
-            year: "numeric",
-        });
-    };
+
 
     const markAsPaid = async (id: string) => {
         try {
@@ -44,18 +41,12 @@ export default function ContributionList({
             <div className="header flex">
                 <h2 className="text-2xl font-bold mb-6">{title}</h2>
                 <div className="flex ml-auto gap-3">
-                    <Link
-                        href="/contributions/all"
-                        className="block btn bt-primary hover:text-blue-600"
-                    >
+                    <LinkBtn href="/contributions/all" >
                         All
-                    </Link>
-                    <Link
-                        href="/contributions/add"
-                        className="block btn bt-primary hover:text-blue-600"
-                    >
+                    </LinkBtn>
+                    <LinkBtn href="/contributions/add">
                         Add
-                    </Link>
+                    </LinkBtn>
                 </div>
             </div>
 

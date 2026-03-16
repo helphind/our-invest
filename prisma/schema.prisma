@@ -14,16 +14,15 @@ model Member {
   phone    String? @unique
   isActive Boolean @default(true)
 
-  userId    String? @unique
-  user      User?   @relation(fields: [userId], references: [id])
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
 
-  joinedAt DateTime   @default(now())
+  joinedAt DateTime @default(now())
 
   contributions Contribution[]
   loans         Loan[]
-  transactions  Transaction[]
+  loanRequests  LoanRequest[]
   approvals     LoanApproval[]
-  LoanRequest   LoanRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -34,14 +33,15 @@ model Member {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(MEMBER)
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  role     Role   @default(MEMBER)
+
   createdAt DateTime @default(now())
 
-  member   Member?
+  member Member?
 }
 
 model Contribution {
@@ -49,37 +49,43 @@ model Contribution {
   memberId String
   amount   Decimal @db.Decimal(12, 2)
 
-  // Store as first day of month (e.g., 2026-02-01)
+  // store first day of month
   month  DateTime
   status ContributionStatus @default(PENDING)
 
-  member       Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([memberId, month]) // Prevent duplicate monthly contribution
+  @@unique([memberId, month])
   @@index([memberId])
   @@index([month])
+  @@index([status])
 }
 
 model Loan {
-  id              String  @id @default(uuid())
-  memberId        String
-  principal       Decimal @db.Decimal(14, 2)
-  interestRate    Decimal @db.Decimal(5, 2)
+  id       String @id @default(uuid())
+  memberId String
+
+  principal    Decimal @db.Decimal(14, 2)
+  interestRate Decimal @db.Decimal(5, 2)
+
   totalAmount     Decimal @db.Decimal(14, 2)
   remainingAmount Decimal @db.Decimal(14, 2)
 
   durationMonths Int
-  loanType LoanType @default(NORMAL)
-  startDate      DateTime   @default(now())
-  status         LoanStatus @default(ACTIVE)
+  emiAmount      Decimal @db.Decimal(12, 2)
 
-  member       Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  emi          EMI[]
-  transactions Transaction[]
+  loanType LoanType   @default(NORMAL)
+  status   LoanStatus @default(ACTIVE)
+
+  startDate DateTime @default(now())
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  emis     EMI[]
+  payments Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -89,16 +95,22 @@ model Loan {
 }
 
 model EMI {
-  id            String  @id @default(uuid())
+  id            String @id @default(uuid())
   loanId        String
   installmentNo Int
-  amount        Decimal @db.Decimal(12, 2)
+
+  amount    Decimal @db.Decimal(12, 2)
+  principal Decimal @db.Decimal(12, 2)
+  interest  Decimal @db.Decimal(12, 2)
 
   dueDate  DateTime
   paidDate DateTime?
-  status   EMIStatus @default(PENDING)
+
+  status EMIStatus @default(PENDING)
 
   loan Loan @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  payments Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -106,54 +118,57 @@ model EMI {
   @@unique([loanId, installmentNo])
   @@index([loanId])
   @@index([status])
+  @@index([dueDate])
 }
 
-model Transaction {
-  id String @id @default(uuid())
+model Payment {
+  id     String  @id @default(uuid())
+  loanId String
+  emiId  String?
 
-  memberId       String
-  loanId         String?
-  contributionId String?
+  amount   Decimal  @db.Decimal(12, 2)
+  paidDate DateTime @default(now())
 
-  type   TransactionType
-  amount Decimal         @db.Decimal(14, 2)
-  note   String?
+  loan Loan @relation(fields: [loanId], references: [id])
+  emi  EMI? @relation(fields: [emiId], references: [id])
 
-  member       Member        @relation(fields: [memberId], references: [id])
-  loan         Loan?         @relation(fields: [loanId], references: [id])
-  contribution Contribution? @relation(fields: [contributionId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([loanId])
+  @@index([emiId])
+}
+
+model LoanRequest {
+  id       String @id @default(uuid())
+  memberId String
+
+  amount Decimal @db.Decimal(14, 2)
+
+  loanType LoanType          @default(NORMAL)
+  status   LoanRequestStatus @default(PENDING)
+
+  approvals LoanApproval[]
+
+  member Member @relation(fields: [memberId], references: [id])
 
   createdAt DateTime @default(now())
 
   @@index([memberId])
-  @@index([loanId])
-  @@index([contributionId])
-  @@index([type])
-}
-
-model LoanRequest {
-  id        String   @id @default(uuid())
-  fundId    String
-  memberId  String
-  amount    Decimal
-  reason    String?
-  status    LoanStatus @default(PENDING)
-
-  approvals LoanApproval[]
-  member    Member     @relation(fields: [memberId], references: [id])
-
-  createdAt DateTime @default(now())
+  @@index([status])
 }
 
 model LoanApproval {
-  id        String   @id @default(uuid())
-  loanRequestId    String
-  memberId  String
-  approved  Boolean
+  id            String @id @default(uuid())
+  loanRequestId String
+  memberId      String
+
+  approved Boolean
+  comment  String?
+
   createdAt DateTime @default(now())
 
-  loan      LoanRequest   @relation(fields: [loanRequestId], references: [id])
-  member    Member @relation(fields: [memberId], references: [id])
+  loanRequest LoanRequest @relation(fields: [loanRequestId], references: [id])
+  member      Member      @relation(fields: [memberId], references: [id])
 
   @@unique([loanRequestId, memberId])
 }
@@ -171,13 +186,15 @@ enum ContributionStatus {
 
 enum LoanStatus {
   ACTIVE
-  CLOSED
   HOLD
+  CLOSED
+}
+
+enum LoanRequestStatus {
   PENDING
   APPROVED
   REJECTED
   DISBURSED
-  REPAID
 }
 
 enum EMIStatus {
@@ -186,14 +203,7 @@ enum EMIStatus {
   OVERDUE
 }
 
-enum TransactionType {
-  CONTRIBUTION
-  EMI_PAYMENT
-  REFUND
-}
-
-
 enum LoanType {
   NORMAL
-  INSTANT  
+  INSTANT
 }

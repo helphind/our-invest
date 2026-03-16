@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ActiveLink from "./ui/ActiveLink";
 
 export default function Sidebar() {
     return (
@@ -8,22 +9,12 @@ export default function Sidebar() {
             </h2>
 
             <nav className="space-y-4">
-                <Link href="/dashboard" className="block hover:text-blue-600">
-                    Dashboard
-                </Link>
-                <Link href="/members" className="block hover:text-blue-600">
-                    Members
-                </Link>
-                <Link href="/loans" className="block hover:text-blue-600">
-                    Loans
-                </Link>
-                <Link href="/contributions" className="block hover:text-blue-600">
-                    Contributions
-                </Link>
-                
-                <Link href="/emi-calculator" className="block hover:text-blue-600">
-                    EMI Calculator
-                </Link>
+                <ActiveLink href="/dashboard">Dashboard</ActiveLink>
+                <ActiveLink href="/members">Members</ActiveLink>
+                <ActiveLink href="/loans">Loans</ActiveLink>
+                <ActiveLink href="/loan-requests">Loan Requests</ActiveLink>
+                <ActiveLink href="/contributions">Contributions</ActiveLink>
+                <ActiveLink href="/emi-calculator">EMI Calculator</ActiveLink>
             </nav>
         </div>
     );

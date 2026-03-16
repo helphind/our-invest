@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
     try {
         const contributionData = await request.json();
-        console.log("Received contribution data:", contributionData);
 
         const monthInput = contributionData.month;
 

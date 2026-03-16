@@ -11,6 +11,7 @@ export const config = {
         "/dashboard/:path*",
         "/members/:path*",
         "/loans/:path*",
+        "/loan-requests/:path*",
         "/payments/:path*",
     ],
 };

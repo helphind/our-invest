@@ -1,21 +1,17 @@
 "use client";
 
 import Loader from "@/app/components/ui/Loader";
-import { monthFieldValue } from "@/app/services/utility.service";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function EditLoanPage({ params }: { id: string }) {
-    const [id, setId] = useState("");
+export default function LoansPage() {
     const [amount, setAmount] = useState(500000);
     const [duration, setDuration] = useState(60);
     const [loading, setLoading] = useState(false);
     const [memberId, setMemberId] = useState("");
     const [loanType, setLoanType] = useState("NORMAL");
-    const [emiStartMonth, setEmiStartMonth] = useState(
-        new Date().toISOString().slice(0, 7),
-    );
+    const [emiStartmonth, setEmiStartMonth] = useState(new Date().toISOString().slice(0, 7));
     const [members, setMembers] = useState([]);
 
     const router = useRouter();
@@ -25,14 +21,13 @@ export default function EditLoanPage({ params }: { id: string }) {
         setLoading(true);
 
         const res = await fetch("/api/loans", {
-            method: "PUT",
+            method: "POST",
             body: JSON.stringify({
-                id,
                 memberId,
                 amount: +amount,
                 duration: +duration,
                 loanType,
-                emiStartMonth,
+                emiStartmonth
             }),
         });
 
@@ -55,33 +50,11 @@ export default function EditLoanPage({ params }: { id: string }) {
         }
 
         loadMembers();
-
-        const loadLoanDetails = async () => {
-            const { id } = await params;
-
-            setLoading(true);
-            const res = await fetch(`/api/loans/${id}`);
-            const data = await res.json();
-
-            console.log("data", data);
-
-            const startDate = monthFieldValue(data.startDate);
-
-            setId(data.id);
-            setAmount(data.principal);
-            setDuration(data.durationMonths);
-            setMemberId(data.memberId);
-            setLoanType(data.loanType);
-            setEmiStartMonth(startDate);
-            setLoading(false);
-        };
-
-        loadLoanDetails();
-    }, [params]);
+    }, []);
 
     return (
         <div>
-            <h2 className="text-2xl font-bold mb-6">Loan Request Details</h2>
+            <h2 className="text-2xl font-bold mb-6">Request Loan</h2>
             {loading && <Loader />}
             <form onSubmit={loanRequest}>
                 <div className="bg-white p-6 rounded-xl shadow max-w-md">
@@ -135,21 +108,18 @@ export default function EditLoanPage({ params }: { id: string }) {
                         </select>
                     </div>
 
-                    {loanType === "NORMAL" && (
-                        <div className="mb-4">
-                            <label className="block mb-2">
-                                EMI Start Month
-                            </label>
-                            <input
-                                type="month"
-                                value={emiStartMonth}
-                                onChange={(e) =>
-                                    setEmiStartMonth(e.target.value)
-                                }
-                                className="w-full border rounded-lg p-2"
-                            />
-                        </div>
-                    )}
+                    
+
+                    <div className="mb-4">
+                        <label className="block mb-2">EMI Start Month</label>
+                        <input
+                            type="month"
+                            value={emiStartmonth}
+                            onChange={(e) => setEmiStartMonth(e.target.value)}
+                            className="w-full border rounded-lg p-2"
+                        />
+                    </div>
+
 
                     <button
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg"
