@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import LinkBtn from "../ui/LinkBtn";
+import { currency } from "@/app/services/utility.service";
 
 export default function LoanList({ loans }: { loans: any[] }) {
     const router = useRouter();
@@ -47,11 +48,12 @@ export default function LoanList({ loans }: { loans: any[] }) {
                         <tr>
                             <th className="p-4 text-left">Name</th>
                             <th className="p-4 text-left">Principal</th>
-                            <th className="p-4 text-left">InterestRate</th>
+                            <th className="p-4 text-left">Interest Rate</th>
                             <th className="p-4 text-left">
                                 Duration (In Months)
                             </th>
-                            <th className="p-4 text-left">TotalAmount</th>
+                            <th className="p-4 text-left">Total Payable</th>
+                            <th className="p-4 text-left">Remaining Payable</th>
                             <th className="p-4 text-left">Status</th>
                             <th className="p-4 text-left">Action</th>
                         </tr>
@@ -60,10 +62,11 @@ export default function LoanList({ loans }: { loans: any[] }) {
                         {loans.map((loan, i) => (
                             <tr key={i} className="border-t">
                                 <td className="p-4">{loan.member.name}</td>
-                                <td className="p-4">{loan.principal}</td>
+                                <td className="p-4">{currency.format(loan.principal)}</td>
                                 <td className="p-4">{loan.interestRate}</td>
                                 <td className="p-4">{loan.durationMonths}</td>
-                                <td className="p-4">{loan.totalAmount}</td>
+                                <td className="p-4">{currency.format(loan.totalPayable)}</td>
+                                <td className="p-4">{currency.format(loan.remainingPayable)}</td>
                                 <td className="p-4">{loan.status}</td>
                                 <td className="p-4 flex gap-2">
                                     <Link

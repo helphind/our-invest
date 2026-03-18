@@ -37,7 +37,7 @@ export default function StatCard({
     type,
 }: {
     title: string;
-    value: number;
+    value: number | string;
     type: keyof typeof styles;
 }) {
     const style = styles[type];

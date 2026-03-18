@@ -16,6 +16,7 @@ export default function EditLoanPage({ params }: { id: string }) {
     const [emiStartMonth, setEmiStartMonth] = useState(
         new Date().toISOString().slice(0, 7),
     );
+    const [status, setStatus] = useState();
     const [members, setMembers] = useState([]);
 
     const router = useRouter();
@@ -73,6 +74,7 @@ export default function EditLoanPage({ params }: { id: string }) {
             setMemberId(data.memberId);
             setLoanType(data.loanType);
             setEmiStartMonth(startDate);
+            setStatus(data.status);
             setLoading(false);
         };
 
@@ -150,6 +152,22 @@ export default function EditLoanPage({ params }: { id: string }) {
                             />
                         </div>
                     )}
+
+                    <div className="mb-4">
+                        <label className="block mb-2">
+                            Status
+                        </label>                    
+
+                        <select
+                            className="w-full border rounded-lg p-2"
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                        >
+                            <option value="ACTIVE">Active</option>
+                            <option value="HOLD">Hold</option>
+                            <option value="CLOSED">Closed</option>
+                        </select>
+                    </div>
 
                     <button
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg"

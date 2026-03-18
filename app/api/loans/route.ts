@@ -1,3 +1,4 @@
+import { createEmiSchedule } from "@/app/services/emi.service";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -7,8 +8,10 @@ export async function POST(request: Request) {
         const formattedData = getDataFromRequest(loanRequestData);
 
         const loan = await prisma.loan.create({
-            data: formattedData,
+            data: { ...formattedData },
         });
+
+        await createEmiSchedule(loan);
 
         return NextResponse.json({
             message: "Loan request processed successfully",
@@ -38,6 +41,8 @@ export async function PUT(request: Request) {
             data: formattedData,
         });
 
+        await createEmiSchedule(loan);
+
         return NextResponse.json({
             message: "Loan request processed successfully",
             loan,
@@ -61,7 +66,7 @@ function getDataFromRequest(loanRequestData: any) {
     const durationMonths = loanRequestData.duration;
     const principal = parseFloat(loanRequestData.amount);
     const loanType = loanRequestData.loanType;
-    const emiStartMonth =  loanRequestData.emiStartMonth
+    const emiStartMonth = loanRequestData.emiStartMonth;
 
     const startDate = new Date(`${emiStartMonth}-01`);
 
@@ -76,18 +81,21 @@ function getDataFromRequest(loanRequestData: any) {
         (principal * monthlyRate * Math.pow(1 + monthlyRate, durationMonths)) /
         (Math.pow(1 + monthlyRate, durationMonths) - 1);
 
-    const totalAmount = emiAmount * durationMonths;
+    const totalPayable = emiAmount * durationMonths;
 
-    const remainingAmount = totalAmount;
+    const remainingPrincipal = principal;
+    const remainingPayable = totalPayable;
 
     return {
-        memberId,
+        member: { connect: { id: memberId } },
         durationMonths,
         principal,
         interestRate,
-        totalAmount,
-        remainingAmount,
+        totalPayable,
+        remainingPrincipal,
+        remainingPayable,
         emiAmount,
-        startDate
+        startDate,
+        loanType,
     };
 }

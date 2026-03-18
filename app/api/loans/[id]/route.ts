@@ -16,6 +16,11 @@ export async function GET(
                         name: true,
                     },
                 },
+                emis: {                    
+                    orderBy: {
+                        installmentNo: 'asc'
+                    }
+                }
             },
         });
 
@@ -53,3 +58,5 @@ export async function DELETE(
         );
     }
 }
+
+

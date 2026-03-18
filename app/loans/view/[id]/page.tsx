@@ -1,46 +1,23 @@
 "use client";
 
 import Loader from "@/app/components/ui/Loader";
-import { currency, formatMonth } from "@/app/services/utility.service";
+import {
+    currency,
+    formatDate,
+    formatMonth,
+} from "@/app/services/utility.service";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function ViewLoanPage({ params }: { id: string }) {
     const [loan, setLoan] = useState(null);
     const [emiSchedule, setEmiSchedule] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const router = useRouter();
+
     useEffect(() => {
-        const calculateEmiSchedule = (data: any) => {
-            const { principal, interestRate, durationMonths, startDate } = data;
-            const monthlyInterestRate = interestRate / 12 / 100;
-            const emiValue =
-                (principal *
-                    monthlyInterestRate *
-                    Math.pow(1 + monthlyInterestRate, durationMonths)) /
-                (Math.pow(1 + monthlyInterestRate, durationMonths) - 1);
-            let balance = principal;
-
-            const rows = [];
-
-            for (let i = 1; i <= durationMonths; i++) {
-                const interestAmount = balance * monthlyInterestRate;
-                const principal = emiValue - interestAmount;
-
-                balance -= principal;
-
-                rows.push({
-                    month: i,
-                    emi: emiValue.toFixed(2),
-                    principal: principal.toFixed(2),
-                    interest: interestAmount.toFixed(2),
-                    balance: balance > 0 ? balance.toFixed(2) : 0,
-                    startDate: startDate,
-                });
-            }
-
-            setEmiSchedule(rows);
-        };
-
         const loadLoanDetails = async () => {
             const { id } = await params;
 
@@ -51,15 +28,46 @@ export default function ViewLoanPage({ params }: { id: string }) {
             console.log("data", data);
 
             setLoan(data);
-            calculateEmiSchedule(data);
+            setEmiSchedule(data.emis);
             setLoading(false);
         };
 
         loadLoanDetails();
     }, [params]);
 
+    const handleEmi = async (rowData: any) => {
+        try {
+            console.log("EMI", rowData);
+            setLoading(true);
+            const response = await fetch(`/api/emi/${rowData.id}`, {
+                method: "POST",
+                body: JSON.stringify({
+                    loanId: rowData.loanId,
+                }),
+            });
+            setLoading(false);
+            if (!response.ok) {
+                throw new Error("EMI Paid");
+            }
+
+            console.log("EMI Paid");
+            toast.success("EMI Marked as Paid");
+
+            router.refresh();
+        } catch (error) {
+            console.error(error);
+            setLoading(false);
+            toast.error("Failed to mark EMI as Paid");
+        }
+    };
+
     return (
-        <div className="p-6">
+        <div>
+            <div>
+                <button className="cursor-pointer font-bold ml-auto pointer">
+                    Back
+                </button>
+            </div>
             <div className="max-w-xl mx-auto bg-white shadow-lg rounded-2xl p-6 mb-3">
                 <h2 className="text-xl font-semibold mb-6">Loan Details</h2>
                 {loading && <Loader />}
@@ -103,12 +111,8 @@ export default function ViewLoanPage({ params }: { id: string }) {
                             </span>
                         </div>
 
-                        
-
                         <div className="flex justify-between border-b pb-2">
-                            <span className="text-gray-500">
-                                Start Date
-                            </span>
+                            <span className="text-gray-500">Start Date</span>
                             <span className="font-semibold text-blue-600">
                                 {formatMonth(loan.startDate)}
                             </span>
@@ -134,22 +138,41 @@ export default function ViewLoanPage({ params }: { id: string }) {
                             </span>
                             <span className="text-red-500">
                                 {currency.format(
-                                    loan.totalAmount - loan.principal,
+                                    loan.totalPayable - loan.principal,
                                 )}
                             </span>
                         </div>
 
-                        <div className="flex justify-between pt-2">
+                        <div className="flex justify-between border-b pb-2">
                             <span className="font-semibold text-gray-600">
                                 Total Payable
                             </span>
                             <span className="font-bold text-green-600">
-                                {currency.format(loan.totalAmount)}
+                                {currency.format(loan.totalPayable)}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between border-b pb-2">
+                            <span className="font-semibold text-gray-600">
+                                Remaining Principal
+                            </span>
+                            <span className="font-bold text-green-600">
+                                {currency.format(loan.remainingPrincipal)}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between pb-2">
+                            <span className="font-semibold text-gray-600">
+                                Remaining Payable
+                            </span>
+                            <span className="font-bold text-green-600">
+                                {currency.format(loan.remainingPayable)}
                             </span>
                         </div>
                     </div>
                 )}
             </div>
+
             {emiSchedule && emiSchedule.length > 0 && (
                 <div className="bg-white shadow rounded-xl p-6">
                     <h2 className="text-lg font-semibold mb-4">
@@ -160,34 +183,47 @@ export default function ViewLoanPage({ params }: { id: string }) {
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b text-left">
-                                    <th className="py-2">Month</th>
+                                    <th className="py-2">S.No</th>
+                                    <th>Due Month</th>
                                     <th>EMI</th>
                                     <th>Principal</th>
                                     <th>Interest</th>
-                                    <th>Balance</th>
+                                    <th>Paid Date</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
 
                             <tbody>
-                                {emiSchedule.map((row) => (
-                                    <tr key={row.month} className="border-b">
-                                        <td className="py-2">{row.startDate}</td>
-                                        <td>{currency.format(row.emi)}</td>
+                                {emiSchedule.map((row: any) => (
+                                    <tr key={row.id} className="border-b">
+                                        <td>{row.installmentNo}</td>
+                                        <td className="py-2">
+                                            {formatMonth(row.dueDate)}
+                                        </td>
+                                        <td>{currency.format(row.amount)}</td>
                                         <td>
                                             {currency.format(row.principal)}
                                         </td>
                                         <td>{currency.format(row.interest)}</td>
-                                        <td>{currency.format(row.balance)}</td>
                                         <td>
-                                            {row.status === 'paid' ? (
-                                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                                            {row.paidDate
+                                                ? formatDate(row.paidDate)
+                                                : "--"}
+                                        </td>
+                                        <td className="text-center">
+                                            {row.status === "PAID" ? (
+                                                <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
                                                     Paid
-                                                </span>
+                                                </div>
                                             ) : (
-                                                <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">
+                                                <div
+                                                    className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs cursor-pointer"
+                                                    onClick={() =>
+                                                        handleEmi(row)
+                                                    }
+                                                >
                                                     Pending
-                                                </span>
+                                                </div>
                                             )}
                                         </td>
                                     </tr>

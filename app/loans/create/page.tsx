@@ -11,7 +11,9 @@ export default function LoansPage() {
     const [loading, setLoading] = useState(false);
     const [memberId, setMemberId] = useState("");
     const [loanType, setLoanType] = useState("NORMAL");
-    const [emiStartmonth, setEmiStartMonth] = useState(new Date().toISOString().slice(0, 7));
+    const [emiStartmonth, setEmiStartMonth] = useState(
+        new Date().toISOString().slice(0, 7),
+    );
     const [members, setMembers] = useState([]);
 
     const router = useRouter();
@@ -27,7 +29,7 @@ export default function LoansPage() {
                 amount: +amount,
                 duration: +duration,
                 loanType,
-                emiStartmonth
+                emiStartmonth,
             }),
         });
 
@@ -108,18 +110,21 @@ export default function LoansPage() {
                         </select>
                     </div>
 
-                    
-
-                    <div className="mb-4">
-                        <label className="block mb-2">EMI Start Month</label>
-                        <input
-                            type="month"
-                            value={emiStartmonth}
-                            onChange={(e) => setEmiStartMonth(e.target.value)}
-                            className="w-full border rounded-lg p-2"
-                        />
-                    </div>
-
+                    {loanType == "NORMAL" && (
+                        <div className="mb-4">
+                            <label className="block mb-2">
+                                EMI Start Month
+                            </label>
+                            <input
+                                type="month"
+                                value={emiStartmonth}
+                                onChange={(e) =>
+                                    setEmiStartMonth(e.target.value)
+                                }
+                                className="w-full border rounded-lg p-2"
+                            />
+                        </div>
+                    )}
 
                     <button
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg"

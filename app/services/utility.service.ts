@@ -10,6 +10,14 @@ export const formatMonth = (date: Date) => {
     });
 };
 
+export const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString("en-US", {
+        month: "long",
+        year: "numeric",
+        day: "2-digit"
+    });
+};
+
 export const monthFieldValue = (date: Date) => {
     return new Date(date).toISOString().slice(0, 7);
 };

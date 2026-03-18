@@ -1,7 +1,9 @@
 import StatCard from "../components/StatCard";
 import {
     getTotalContributions,
+    getTotalInterests,
     getTotalPendingContributions,
+    getTotalReturns,
 } from "../services/contribution.service";
 import {
     getActiveInstantLoansCount,
@@ -11,17 +13,22 @@ import {
     getActiveMembersCount,
     getMembersCount,
 } from "../services/member.service";
+import { currency } from "../services/utility.service";
 
 export default async function DashboardPage() {
+
+    const totalContributions = await getTotalContributions();
+    const totalInterest = await getTotalInterests();    
+    const totalReturns = await getTotalReturns();
+    const totalPendingContributions = await getTotalPendingContributions();
+    
+
     const allMembers = await getMembersCount();
     const activeMembers = await getActiveMembersCount();
     const activeLoans = await getActiveLoansCount();
     const instantLoans = await getActiveInstantLoansCount();
 
-    const totalContributions = await getTotalContributions();
-    const totalPendingContributions = await getTotalPendingContributions();
-    const totalReturns = await getActiveInstantLoansCount();
-    const totalInterest = await getActiveInstantLoansCount();
+    
     const amountOnHold = await getActiveInstantLoansCount();
     const availableAmountForLoans = await getActiveInstantLoansCount();
 
@@ -32,33 +39,32 @@ export default async function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard
                     title="Total Contributions"
-                    value={totalContributions}
+                    value={currency.format(totalContributions)}
                     type="payments"
                 />
-                <StatCard
-                    title="Total Pending Contributions"
-                    value={totalPendingContributions}
-                    type="pending"
-                />
+
                 <StatCard
                     title="Total Interest"
-                    value={totalInterest}
+                    value={currency.format(totalInterest)}
                     type="payments"
                 />
+
                 <StatCard
                     title="Total Return"
-                    value={totalReturns}
+                    value={currency.format(totalReturns)}
                     type="loans"
                 />
+
                 <StatCard
-                    title="Amount OnHold"
-                    value={amountOnHold}
+                    title="Total Pending Contributions"
+                    value={currency.format(totalPendingContributions)}
                     type="pending"
                 />
                 
-               <StatCard
+                
+                <StatCard
                     title="Amount OnHold"
-                    value={amountOnHold}
+                    value={currency.format(amountOnHold)}
                     type="pending"
                 />
                 
@@ -67,6 +73,7 @@ export default async function DashboardPage() {
                     value={activeLoans}
                     type="loans"
                 />
+
                 <StatCard
                     title="Active Instant Loans"
                     value={instantLoans}
@@ -75,7 +82,7 @@ export default async function DashboardPage() {
 
                 <StatCard
                     title="Available Amount for Loans"
-                    value={availableAmountForLoans}
+                    value={currency.format(availableAmountForLoans)}
                     type="loans"
                 />
 

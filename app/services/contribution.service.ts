@@ -51,25 +51,52 @@ export async function getCurrentMonthContributions() {
 }
 
 export async function getTotalContributions() {
-    const contributions = await prisma.contribution.findMany({
+    const contributions = await prisma.contribution.aggregate({
         where: {
             status: "PAID",
         },
+        _sum: {
+            amount: true
+        }
     });
 
-    return contributions.reduce((total, contribution) => {
-        return total + Number(contribution.amount);
-    }, 0);
+    return contributions._sum.amount;
 }
 
 export async function getTotalPendingContributions() {
-    const contributions = await prisma.contribution.findMany({
+    const contributions = await prisma.contribution.aggregate({
         where: {
             status: "PENDING",
         },
+        _sum: {
+            amount: true
+        }
     });
 
-    return contributions.reduce((total, contribution) => {
-        return total + Number(contribution.amount);
-    }, 0);
+    return contributions._sum.amount;
+}
+
+
+
+export async function getTotalInterests() {
+    const contributions = await prisma.eMI.aggregate({
+        where: {
+            status: "PAID",
+        },
+        _sum: {
+            interest: true
+        }
+    });
+
+    return contributions._sum.interest;
+}
+
+
+export async function getTotalReturns() {
+    const contributions = await getTotalContributions();
+    const interest = await getTotalInterests();
+
+    const total = Number(contributions) + Number(interest);
+
+    return total;
 }
