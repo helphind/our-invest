@@ -1,21 +1,30 @@
 import Link from "next/link";
 
+const buttonColor: any = {
+    red: "bg-red-600 hover:bg-red-700",
+    blue: "bg-blue-600 hover:bg-blue-700",
+    green: "bg-green-600 hover:bg-green-700",
+};
+
 export default function LinkBtn({
     href,
     children,
+    btnType,
 }: {
     href: string;
     children: React.ReactNode;
+    btnType?: string;
 }) {
+    const btnColor = btnType ? buttonColor[btnType] : buttonColor.blue;
+
     return (
         <Link
             href={href}
-            className="ml-auto inline-flex items-center gap-2 px-5 py-2.5 
-                        bg-blue-600 text-white font-medium rounded-lg 
+            className={`${btnColor} ml-auto inline-flex items-center gap-2 px-5 py-2.5 
+            text-white font-medium rounded-lg 
                         shadow-md hover:shadow-xl 
-                        hover:bg-blue-700 
                         transform hover:-translate-y-0.5 
-                        transition-all duration-200"
+                        transition-all duration-200`}
         >
             {children}
         </Link>

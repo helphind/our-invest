@@ -4,10 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import LinkBtn from "../ui/LinkBtn";
-import { currency } from "@/app/services/utility.service";
+import { currency, formatMonth } from "@/app/services/utility.service";
+import { useSession } from "next-auth/react";
+import { Role } from "@/app/generated/prisma/enums";
 
 export default function LoanList({ loans }: { loans: any[] }) {
     const router = useRouter();
+    const { data: session } = useSession();
+
+    const isAdmin = session?.user?.role === Role.ADMIN;
 
     const handleDelete = async (id: string) => {
         const confirmed = confirm(
@@ -38,8 +43,7 @@ export default function LoanList({ loans }: { loans: any[] }) {
         <div>
             <div className="header flex">
                 <h2 className="text-2xl font-bold mb-6">Loans</h2>
-
-                <LinkBtn href="/loans/create">Create Loan</LinkBtn>
+                {isAdmin && <LinkBtn href="/loans/create">Create Loan</LinkBtn>}
             </div>
 
             <div className="bg-white rounded-xl shadow overflow-hidden">
@@ -52,6 +56,8 @@ export default function LoanList({ loans }: { loans: any[] }) {
                             <th className="p-4 text-left">
                                 Duration (In Months)
                             </th>
+                            <th className="p-4 text-left">EMI Start Month</th>
+                            <th className="p-4 text-left">EMI</th>
                             <th className="p-4 text-left">Total Payable</th>
                             <th className="p-4 text-left">Remaining Payable</th>
                             <th className="p-4 text-left">Status</th>
@@ -62,11 +68,23 @@ export default function LoanList({ loans }: { loans: any[] }) {
                         {loans.map((loan, i) => (
                             <tr key={i} className="border-t">
                                 <td className="p-4">{loan.member.name}</td>
-                                <td className="p-4">{currency.format(loan.principal)}</td>
+                                <td className="p-4">
+                                    {currency.format(loan.principal)}
+                                </td>
                                 <td className="p-4">{loan.interestRate}</td>
                                 <td className="p-4">{loan.durationMonths}</td>
-                                <td className="p-4">{currency.format(loan.totalPayable)}</td>
-                                <td className="p-4">{currency.format(loan.remainingPayable)}</td>
+                                <td className="p-4">
+                                    {formatMonth(loan.startDate)}
+                                </td>
+                                <td className="p-4">
+                                    {currency.format(loan.emiAmount)}
+                                </td>
+                                <td className="p-4">
+                                    {currency.format(loan.totalPayable)}
+                                </td>
+                                <td className="p-4">
+                                    {currency.format(loan.remainingPayable)}
+                                </td>
                                 <td className="p-4">{loan.status}</td>
                                 <td className="p-4 flex gap-2">
                                     <Link
@@ -75,20 +93,25 @@ export default function LoanList({ loans }: { loans: any[] }) {
                                     >
                                         View
                                     </Link>
+                                    {isAdmin && loan.status !== "CLOSED" && (
+                                        <>
+                                            <Link
+                                                href={`/loans/edit/${loan.id}`}
+                                                className="px-4 py-1 text-sm bg-amber-500 text-white rounded-full hover:bg-amber-600 transition"
+                                            >
+                                                Edit
+                                            </Link>
 
-                                    <Link
-                                        href={`/loans/edit/${loan.id}`}
-                                        className="px-4 py-1 text-sm bg-amber-500 text-white rounded-full hover:bg-amber-600 transition"
-                                    >
-                                        Edit
-                                    </Link>
-
-                                    <button
-                                        onClick={() => handleDelete(loan.id)}
-                                        className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
-                                    >
-                                        Delete
-                                    </button>
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(loan.id)
+                                                }
+                                                className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
+                                            >
+                                                Delete
+                                            </button>
+                                        </>
+                                    )}
                                 </td>
                             </tr>
                         ))}

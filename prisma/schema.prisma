@@ -35,7 +35,7 @@ model Member {
 model User {
   id       String @id @default(uuid())
   name     String
-  email    String @unique
+  username String @unique
   password String
   role     Role   @default(MEMBER)
 
@@ -153,6 +153,13 @@ model LoanApproval {
   @@unique([loanRequestId, memberId])
 }
 
+model FundConfig {
+  id             String    @id @default(uuid())
+  monthlyAmount  Float
+  isAutoGenerate Boolean   @default(true)
+  lastRunAt      DateTime?
+}
+
 enum Role {
   ADMIN
   MEMBER
@@ -162,6 +169,8 @@ enum ContributionStatus {
   PENDING
   PAID
   OVERDUE
+  SKIPPED
+  WAIVED
 }
 
 enum LoanStatus {

@@ -21,6 +21,8 @@ export async function POST(
                 throw new Error("Invalid EMI");
             }
 
+            const loanId = emi.loanId
+
             await tx.eMI.update({
                 where: {
                     id: param.id,
@@ -32,16 +34,31 @@ export async function POST(
             });
 
             await tx.loan.update({
-                where: { id: emi.loanId },
+                where: { id: loanId },
                 data: {
                     remainingPrincipal: {
                         decrement: emi.principal, // ✅ only principal
                     },
                     remainingPayable: {
-                        decrement: emi.amount
-                    }
+                        decrement: emi.amount,
+                    },
                 },
             });
+
+            const pendingEMICount = await tx.eMI.count({
+                where: {
+                    loanId: loanId,
+                    status: "PENDING",
+                },
+            });
+
+            // 4. If no pending → close loan
+            if (pendingEMICount === 0) {
+                await prisma.loan.update({
+                    where: { id: loanId },
+                    data: { status: "CLOSED" },
+                });
+            }
         });
 
         return NextResponse.json({

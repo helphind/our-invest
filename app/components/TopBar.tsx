@@ -1,9 +1,13 @@
-import { getServerSession } from "next-auth";
-import LogoutButton from "./ui/LogoutButton";
-import { authOptions } from "@/lib/auth";
+"use client";
 
-export default async function TopBar() {
-    const session = await getServerSession(authOptions);
+import LogoutButton from "./ui/LogoutButton";
+import { useSession } from "next-auth/react";
+
+export default function TopBar() {
+    const { data: session } = useSession();
+
+    console.log
+    ('session', session)
 
     return (
         <div className="bg-white shadow px-6 py-4 flex justify-between items-center">

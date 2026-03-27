@@ -36,12 +36,42 @@ export async function PUT(request: Request) {
         const formattedData = getDataFromRequest(loanRequestData);
         console.log("Received loan request data:", formattedData);
 
-        const loan = await prisma.loan.update({
-            where: { id },
-            data: formattedData,
-        });
+        const status = loanRequestData.status;
 
-        await createEmiSchedule(loan);
+        let loan;
+
+        if (status === "CLOSED") {
+            await prisma.$transaction(async (tx) => {
+                loan = await tx.loan.update({
+                    where: { id },
+                    data: {
+                        status: "CLOSED",
+                        remainingPayable: 0,
+                        remainingPrincipal: 0,
+                    },
+                });
+
+                await tx.eMI.updateMany({
+                    where: {
+                        loanId: id,
+                        status: "PENDING",
+                    },
+                    data: {
+                        status: "PAID",
+                        paidDate: new Date(),
+                    },
+                });
+            });
+        } else {
+            loan = await prisma.loan.update({
+                where: { id },
+                data: formattedData,
+            });
+
+            if (status !== "HOLD") {
+                await createEmiSchedule(loan);
+            }
+        }
 
         return NextResponse.json({
             message: "Loan request processed successfully",
@@ -77,9 +107,10 @@ function getDataFromRequest(loanRequestData: any) {
 
     const monthlyRate = interestRate / 100 / 12;
 
-    const emiAmount =
+    const emiAmount = Math.round(
         (principal * monthlyRate * Math.pow(1 + monthlyRate, durationMonths)) /
-        (Math.pow(1 + monthlyRate, durationMonths) - 1);
+            (Math.pow(1 + monthlyRate, durationMonths) - 1),
+    );
 
     const totalPayable = emiAmount * durationMonths;
 

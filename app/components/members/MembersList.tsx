@@ -4,10 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import LinkBtn from "../ui/LinkBtn";
+import { Role } from "@/app/generated/prisma/enums";
+import { useSession } from "next-auth/react";
 
 export default function MembersList({ members }: { members: any[] }) {
-
     const router = useRouter();
+
+    const { data: session } = useSession();
+
+    const isAdmin = session?.user?.role === Role.ADMIN;
 
     const handleDelete = async (id: string) => {
         const confirmed = confirm(
@@ -22,7 +27,7 @@ export default function MembersList({ members }: { members: any[] }) {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to delete member");               
+                throw new Error("Failed to delete member");
             }
 
             toast.success("Member deleted successfully");
@@ -37,8 +42,8 @@ export default function MembersList({ members }: { members: any[] }) {
     return (
         <div>
             <div className="header flex">
-                <h2 className="text-2xl font-bold mb-6">Members</h2>             
-                <LinkBtn href="/members/add">Add</LinkBtn>
+                <h2 className="text-2xl font-bold mb-6">Members</h2>
+                {isAdmin && <LinkBtn href="/members/add">Add</LinkBtn>}
             </div>
 
             <div className="bg-white rounded-xl shadow overflow-hidden">
@@ -49,7 +54,9 @@ export default function MembersList({ members }: { members: any[] }) {
                             <th className="p-4 text-left">Email</th>
                             <th className="p-4 text-left">Phone</th>
                             <th className="p-4 text-left">Status</th>
-                            <th className="p-4 text-left">Action</th>
+                            {isAdmin && (
+                                <th className="p-4 text-left">Action</th>
+                            )}
                         </tr>
                     </thead>
                     <tbody>
@@ -61,28 +68,30 @@ export default function MembersList({ members }: { members: any[] }) {
                                 <td className="p-4">
                                     {m.isActive ? "Active" : "Inactive"}
                                 </td>
-                                <td className="p-4 flex gap-2">
-                                    <Link
-                                        href={`/members/${m.id}`}
-                                        className="px-4 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
-                                    >
-                                        View
-                                    </Link>
+                                {isAdmin && (
+                                    <td className="p-4 flex gap-2">
+                                        <Link
+                                            href={`/members/${m.id}`}
+                                            className="px-4 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+                                        >
+                                            View
+                                        </Link>
 
-                                    <Link
-                                        href={`/members/edit/${m.id}`}
-                                        className="px-4 py-1 text-sm bg-amber-500 text-white rounded-full hover:bg-amber-600 transition"
-                                    >
-                                        Edit
-                                    </Link>
+                                        <Link
+                                            href={`/members/edit/${m.id}`}
+                                            className="px-4 py-1 text-sm bg-amber-500 text-white rounded-full hover:bg-amber-600 transition"
+                                        >
+                                            Edit
+                                        </Link>
 
-                                    <button
-                                        onClick={() => handleDelete(m.id)}
-                                        className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"                                        
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
+                                        <button
+                                            onClick={() => handleDelete(m.id)}
+                                            className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                )}
                             </tr>
                         ))}
                     </tbody>

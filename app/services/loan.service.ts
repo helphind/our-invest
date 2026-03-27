@@ -7,16 +7,20 @@ export async function getAllLoans() {
                 select: {
                     name: true,
                 },
-            },
+            },            
         },
+        orderBy: {
+            startDate: 'desc'
+        }
     });
 
     return loans.map((loan) => ({
         ...loan,
         principal: Number(loan.principal),
+        remainingPrincipal: Number(loan.remainingPrincipal),
         interestRate: Number(loan.interestRate),
-        totalAmount: Number(loan.totalAmount),
-        remainingAmount: Number(loan.remainingAmount),
+        totalPayable: Number(loan.totalPayable),
+        remainingPayable: Number(loan.remainingPayable),
         emiAmount: Number(loan.emiAmount),
     }));
 }
@@ -38,6 +42,18 @@ export async function getActiveLoans() {
 export async function getActiveLoansCount() {
     return prisma.loan.count({
         where: { status: "ACTIVE", loanType: "NORMAL" },
+    });
+}
+
+export async function getClosedLoansCount() {
+    return prisma.loan.count({
+        where: { status: "CLOSED", loanType: "NORMAL" },
+    });
+}
+
+export async function getHoldLoansCount() {
+    return prisma.loan.count({
+        where: { status: "HOLD", loanType: "NORMAL" },
     });
 }
 

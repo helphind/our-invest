@@ -12,6 +12,7 @@ export const config = {
         "/members/:path*",
         "/loans/:path*",
         "/loan-requests/:path*",
-        "/payments/:path*",
+        "/contributions/:path*",
+        "/emi-calculator/:path*",
     ],
 };

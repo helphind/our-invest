@@ -1,3 +1,5 @@
+"use client";
+
 const styles = {
     membersTotal: {
         iconBg: "from-green-500 to-green-600",

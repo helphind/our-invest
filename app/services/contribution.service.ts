@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { log } from "console";
 
 export async function getAllContributions() {
     const contributions = await prisma.contribution.findMany({
@@ -10,9 +9,14 @@ export async function getAllContributions() {
                 },
             },
         },
-        orderBy: {
-            month: "desc",
-        },
+        orderBy: [
+            { month: "desc" },
+            {
+                member: {
+                    name: "asc",
+                },
+            },
+        ],
     });
 
     return contributions.map((contribution) => ({
@@ -42,6 +46,11 @@ export async function getCurrentMonthContributions() {
                 },
             },
         },
+        orderBy: {
+            member: {
+                name: "asc",
+            },
+        },
     });
 
     return contributions.map((contribution) => ({
@@ -56,8 +65,8 @@ export async function getTotalContributions() {
             status: "PAID",
         },
         _sum: {
-            amount: true
-        }
+            amount: true,
+        },
     });
 
     return contributions._sum.amount;
@@ -69,14 +78,25 @@ export async function getTotalPendingContributions() {
             status: "PENDING",
         },
         _sum: {
-            amount: true
-        }
+            amount: true,
+        },
     });
 
     return contributions._sum.amount;
 }
 
+export async function getTotalSkippedContributions() {
+    const contributions = await prisma.contribution.aggregate({
+        where: {
+            status: "SKIPPED",
+        },
+        _sum: {
+            amount: true,
+        },
+    });
 
+    return contributions._sum.amount;
+}
 
 export async function getTotalInterests() {
     const contributions = await prisma.eMI.aggregate({
@@ -84,13 +104,12 @@ export async function getTotalInterests() {
             status: "PAID",
         },
         _sum: {
-            interest: true
-        }
+            interest: true,
+        },
     });
 
     return contributions._sum.interest;
 }
-
 
 export async function getTotalReturns() {
     const contributions = await getTotalContributions();
@@ -99,4 +118,17 @@ export async function getTotalReturns() {
     const total = Number(contributions) + Number(interest);
 
     return total;
+}
+
+export async function getAvailableAmountForLoan() {
+    const loanSum = await prisma.loan.aggregate({
+        _sum: { remainingPrincipal: true },
+    });
+
+    const totalContribution = await getTotalReturns();
+    const totalLoan = Number(loanSum._sum.remainingPrincipal || 0);
+
+    const availableAmount = totalContribution - totalLoan;
+
+    return availableAmount;
 }
