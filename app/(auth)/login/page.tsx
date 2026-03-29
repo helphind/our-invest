@@ -1,9 +1,11 @@
 "use client";
 
+import LinkBtn from "@/app/components/ui/LinkBtn";
 import Loader from "@/app/components/ui/Loader";
 import { AppConfig } from "@/config/app.config";
 import { loginSchema } from "@/lib/validation/login.schema";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
@@ -105,6 +107,9 @@ export default function LoginPage() {
                 >
                     Login
                 </button>
+
+                {/* Change Password */}
+                <Link href="/change-password">Change Password</Link>
             </form>
         </div>
     );

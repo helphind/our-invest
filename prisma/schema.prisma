@@ -42,6 +42,9 @@ model User {
   createdAt DateTime @default(now())
 
   member Member?
+
+  resetToken       String?
+  resetTokenExpiry DateTime?
 }
 
 model Contribution {
