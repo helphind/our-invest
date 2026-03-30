@@ -44,13 +44,13 @@ export default async function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard
                     title="Total Contributions"
-                    value={currency.format(totalContributions)}
+                    value={totalContributions ? currency.format(Number(totalContributions)): '-'}
                     type="payments"
                 />
 
                 <StatCard
                     title="Total Interest"
-                    value={currency.format(totalInterest)}
+                    value={totalInterest ? currency.format(Number(totalInterest)): '-'}
                     type="payments"
                 />
 
@@ -62,13 +62,13 @@ export default async function DashboardPage() {
 
                 <StatCard
                     title="Total Pending Contributions"
-                    value={currency.format(totalPendingContributions)}
+                    value={totalPendingContributions ? currency.format(Number(totalPendingContributions)) : '-'}
                     type="pending"
                 />
 
                 <StatCard
                     title="Total Waived / Skipped Contributions"
-                    value={currency.format(totalSkippedContributions)}
+                    value={totalSkippedContributions ? currency.format(Number(totalSkippedContributions)) : '-'}
                     type="pending"
                 />
 

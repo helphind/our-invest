@@ -37,7 +37,7 @@ export default function ContributionList({
     const [filterMonth, setFilterMonth] = useState(
         new Date().toISOString().slice(0, 7),
     );
-    const [filteredContributions, setFilteredContributions] = useState([]);
+    const [filteredContributions, setFilteredContributions] = useState<any[]>([]);
     const [selected, setSelected] = useState<string[]>([]);
 
     const { data: session } = useSession();

@@ -1,6 +1,7 @@
 "use client";
 
 import { Member } from "@/app/interface/Member.type";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -13,7 +14,7 @@ export default function MemberForm({
 }) {
     const [loading, setLoading] = useState(false);
 
-    const [form, setForm] = useState({
+    const [form, setForm] = useState<any>({
         ...member,
     });
 
@@ -21,7 +22,7 @@ export default function MemberForm({
 
     const handleChange = (e: any) => {
         const { name, type, value, checked } = e.target;
-        setForm((prev) => ({
+        setForm((prev: any) => ({
             ...prev,
             [name]: type === "checkbox" ? checked : value,
         }));
@@ -106,12 +107,12 @@ export default function MemberForm({
 
             {/* Buttons */}
             <div className="flex gap-3 pt-4">
-                <a
+                <Link
                     href="/members"
                     className="px-4 py-2 text-sm border rounded-md hover:bg-gray-50"
                 >
                     Cancel
-                </a>
+                </Link>
 
                 <button
                     type="submit"
@@ -127,41 +128,3 @@ export default function MemberForm({
         </form>
     );
 }
-
-/*
-<form onSubmit={handleSubmit} className="space-y-4">
-            <input
-                name="name"
-                placeholder="Name"
-                value={form.name}
-                onChange={handleChange}
-                className="border p-2 w-full"
-                required
-            />
-
-            <input
-                name="email"
-                type="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={handleChange}
-                className="border p-2 w-full"
-                required
-            />
-
-            <input
-                name="phone"
-                placeholder="Phone"
-                value={form.phone}
-                onChange={handleChange}
-                className="border p-2 w-full"
-            />
-
-            <button
-                className="bg-blue-600 text-white px-4 py-2 rounded w-full"
-                disabled={loading}
-            >
-                {loading ? "Saving..." : "Add Member"}
-            </button>
-        </form>
-        */

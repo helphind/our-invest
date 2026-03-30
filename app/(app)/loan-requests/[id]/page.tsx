@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function EditLoanRequestPage({ params }: { id: string }) {
+export default function EditLoanRequestPage({ params }: { params: { id: string } })  {
     const [id, setId] = useState("");
     const [amount, setAmount] = useState(500000);
     const [duration, setDuration] = useState(60);
@@ -96,7 +96,7 @@ export default function EditLoanRequestPage({ params }: { id: string }) {
                         <input
                             type="number"
                             value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
+                            onChange={(e) => setAmount(Number(e.target.value))}
                             className="w-full border rounded-lg p-2"
                         />
                     </div>
@@ -108,7 +108,7 @@ export default function EditLoanRequestPage({ params }: { id: string }) {
                         <input
                             type="number"
                             value={duration}
-                            onChange={(e) => setDuration(e.target.value)}
+                            onChange={(e) => setDuration(Number(e.target.value))}
                             className="w-full border rounded-lg p-2"
                         />
                     </div>

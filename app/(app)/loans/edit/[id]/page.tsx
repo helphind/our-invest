@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function EditLoanPage({ params }: { id: string }) {
+export default function EditLoanPage({ params }: { params: { id: string } }) {
     const [id, setId] = useState("");
     const [amount, setAmount] = useState(500000);
     const [duration, setDuration] = useState(60);
@@ -16,7 +16,7 @@ export default function EditLoanPage({ params }: { id: string }) {
     const [emiStartMonth, setEmiStartMonth] = useState(
         new Date().toISOString().slice(0, 7),
     );
-    const [status, setStatus] = useState();
+    const [status, setStatus] = useState<string>("");
     const [members, setMembers] = useState([]);
 
     const router = useRouter();
@@ -109,7 +109,7 @@ export default function EditLoanPage({ params }: { id: string }) {
                         <input
                             type="number"
                             value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
+                            onChange={(e) => setAmount(Number(e.target.value))}
                             className="w-full border rounded-lg p-2"
                         />
                     </div>
@@ -121,7 +121,7 @@ export default function EditLoanPage({ params }: { id: string }) {
                         <input
                             type="number"
                             value={duration}
-                            onChange={(e) => setDuration(e.target.value)}
+                            onChange={(e) => setDuration(Number(e.target.value))}
                             className="w-full border rounded-lg p-2"
                         />
                     </div>

@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-    request: Request,
-    { params }: { params: { id: string } },
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
 ) {
     try {
         const { id } = await params;
@@ -37,8 +37,8 @@ export async function GET(
 }
 
 export async function DELETE(
-    request: Request,
-    { params }: { params: { id: string } },
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
 ) {
     try {
         const { id } = await params;

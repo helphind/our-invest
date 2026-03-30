@@ -11,8 +11,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function ViewLoanPage({ params }: { id: string }) {
-    const [loan, setLoan] = useState(null);
+export default function ViewLoanPage({ params }: { params: { id: string } }) {
+    const [loan, setLoan] = useState<any>(null);
     const [emiSchedule, setEmiSchedule] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -65,7 +65,10 @@ export default function ViewLoanPage({ params }: { id: string }) {
     return (
         <div>
             <div>
-                <Link href="/loans" className="cursor-pointer font-bold ml-auto pointer">
+                <Link
+                    href="/loans"
+                    className="cursor-pointer font-bold ml-auto pointer"
+                >
                     Back
                 </Link>
             </div>

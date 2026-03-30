@@ -98,7 +98,7 @@ export default async function LoanApprovalsPage({
                 <div>
                     <p className="text-gray-500">Amount</p>
                     <p className="font-medium">
-                        {currency.format(loanRequest.amount)}
+                        {loanRequest.amount ? currency.format(Number(loanRequest.amount)) : '-'}
                     </p>
                 </div>
 

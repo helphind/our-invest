@@ -75,7 +75,7 @@ export default function LoansPage() {
                         <input
                             type="number"
                             value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
+                            onChange={(e) => setAmount(Number(e.target.value))}
                             className="w-full border rounded-lg p-2"
                         />
                     </div>

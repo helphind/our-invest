@@ -1,16 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import { log } from "console";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
-    req: Request,
-    { params }: { params: { id: string } },
+    req: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
 ) {
     try {
-        const reqBody = await req.json();
         const param = await params;
-
-        log("reqBody", reqBody, param);
 
         await prisma.$transaction(async (tx) => {
             const emi = await tx.eMI.findUnique({
@@ -21,7 +17,7 @@ export async function POST(
                 throw new Error("Invalid EMI");
             }
 
-            const loanId = emi.loanId
+            const loanId = emi.loanId;
 
             await tx.eMI.update({
                 where: {

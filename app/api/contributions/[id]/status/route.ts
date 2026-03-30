@@ -1,10 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { log } from "console";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
-    request: Request,
-    { params }: { params: { id: string } },
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
 ) {
     try {
         const { id } = await params;
@@ -12,8 +11,6 @@ export async function POST(
         const req = await request.json();
 
         const status = req.status;
-
-        log('status', status)
 
         await prisma.contribution.update({
             where: {
@@ -24,7 +21,9 @@ export async function POST(
             },
         });
 
-        return NextResponse.json({ message: `Contribution marked as ${status}` });
+        return NextResponse.json({
+            message: `Contribution marked as ${status}`,
+        });
     } catch (error) {
         console.error("Error marking contribution as paid:", error);
         return NextResponse.json(

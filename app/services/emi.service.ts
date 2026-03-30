@@ -15,7 +15,7 @@ export async function createEmiSchedule(loan: any) {
 
     const startDate = new Date(loan.startDate);
 
-    const emiList = [];
+    const emiList: any[] = [];
 
     for (let i = 0; i < months; i++) {
         const interest = balance * monthlyRate;

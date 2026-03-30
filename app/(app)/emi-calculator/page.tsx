@@ -7,8 +7,8 @@ export default function EmiCalculator() {
     const [amount, setAmount] = useState(500000);
     const [interest, setInterest] = useState(8);
     const [tenure, setTenure] = useState(60);
-    const [emi, setEmi] = useState(null);
-    const [schedule, setSchedule] = useState([]);
+    const [emi, setEmi] = useState<number | null>(null);
+    const [schedule, setSchedule] = useState<any[]>([]);
 
     const [totalInterest, setTotalInterest] = useState(0);
     const [totalPayment, setTotalPayment] = useState(0);
@@ -63,7 +63,7 @@ export default function EmiCalculator() {
                         placeholder="Loan Amount"
                         className="border p-2 rounded-lg w-full"
                         value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
+                        onChange={(e) => setAmount(Number(e.target.value))}
                     />
                 </div>
                 <div>
@@ -75,7 +75,7 @@ export default function EmiCalculator() {
                         placeholder="Interest %"
                         className="border p-2 rounded-lg w-full"
                         value={interest}
-                        onChange={(e) => setInterest(e.target.value)}
+                        onChange={(e) => setInterest(Number(e.target.value))}
                     />
                 </div>
                 <div>
@@ -87,7 +87,7 @@ export default function EmiCalculator() {
                         placeholder="Tenure (months)"
                         className="border p-2 rounded-lg w-full"
                         value={tenure}
-                        onChange={(e) => setTenure(e.target.value)}
+                        onChange={(e) => setTenure(Number(e.target.value))}
                     />
                 </div>
 
