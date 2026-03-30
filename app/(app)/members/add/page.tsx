@@ -1,3 +1,4 @@
+"use client";
 import MemberForm from "@/app/components/members/MemberForm";
 
 export default function AddMemberPage() {

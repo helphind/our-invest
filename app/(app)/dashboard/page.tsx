@@ -1,4 +1,4 @@
-/*
+
 import StatCard from "../../components/StatCard";
 import {
     getAvailableAmountForLoan,
@@ -19,6 +19,8 @@ import {
     getMembersCount,
 } from "../../services/member.service";
 import { currency } from "../../services/utility.service";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
     const totalContributions = await getTotalContributions();
@@ -127,11 +129,4 @@ export default async function DashboardPage() {
             </div>
         </div>
     );
-}
-*/
-
-export default function DashboardPage() {
-    return (
-        <div>Dashboard</div>
-    )
 }
