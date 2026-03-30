@@ -108,8 +108,15 @@ export default function LoginPage() {
                     Login
                 </button>
 
-                {/* Change Password */}
-                <Link href="/change-password">Change Password</Link>
+
+                <div className="text-center">
+                    <Link
+                        href="/forget-password"
+                        className="text-sm text-gray-500 hover:text-black"
+                    >
+                        Forget Password
+                    </Link>
+                </div>
             </form>
         </div>
     );
