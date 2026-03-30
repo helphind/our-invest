@@ -34,4 +34,26 @@ export async function POST(request: Request) {
 }
 
 
+export async function GET() {
+    const loanRequests = await prisma.loanRequest.findMany({
+        include: {
+            member: {
+                select: {
+                    name: true,
+                },
+            },
+        },
+    });
+
+     const formattedLoanRequests = loanRequests.map((loanRequest) => ({
+        ...loanRequest,
+        amount: Number(loanRequest.amount),
+    }));
+
+    return NextResponse.json(formattedLoanRequests);
+}
+
+
+
+
 

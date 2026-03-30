@@ -2,6 +2,8 @@ import MemberForm from "@/app/components/members/MemberForm";
 import { Member } from "@/app/interface/Member.type";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function MemberEditPage({ params }: any) {
     const param = await params;
 
