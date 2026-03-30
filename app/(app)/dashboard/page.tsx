@@ -1,3 +1,4 @@
+/*
 import StatCard from "../../components/StatCard";
 import {
     getAvailableAmountForLoan,
@@ -126,4 +127,11 @@ export default async function DashboardPage() {
             </div>
         </div>
     );
+}
+*/
+
+export default function DashboardPage() {
+    return (
+        <div>Dashboard</div>
+    )
 }
