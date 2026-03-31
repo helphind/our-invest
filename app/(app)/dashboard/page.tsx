@@ -45,7 +45,7 @@ export default async function DashboardPage() {
     const activeMembers = await getActiveMembersCount();
 
     return (
-        <div>
+        <div className="pb-6">
             <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
