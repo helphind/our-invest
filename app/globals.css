@@ -25,6 +25,21 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+html, body {
+  color: #111827; /* Tailwind text-gray-900 */
+  background-color: #ffffff;
+}
+
+input, textarea, select {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+}
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: #111827 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
