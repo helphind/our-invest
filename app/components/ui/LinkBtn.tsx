@@ -10,17 +10,19 @@ export default function LinkBtn({
     href,
     children,
     btnType,
+    className = "",
 }: {
     href: string;
     children: React.ReactNode;
     btnType?: string;
+    className?: string;
 }) {
     const btnColor = btnType ? buttonColor[btnType] : buttonColor.blue;
 
     return (
         <Link
             href={href}
-            className={`${btnColor} ml-auto inline-flex items-center gap-2 px-5 py-2.5 
+            className={`${btnColor}  ${className} ml-auto inline-flex items-center gap-2 px-5 py-2.5 
             text-white font-medium rounded-lg 
                         shadow-md hover:shadow-xl 
                         transform hover:-translate-y-0.5 
