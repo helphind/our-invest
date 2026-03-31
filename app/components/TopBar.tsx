@@ -14,7 +14,7 @@ export default function TopBar() {
             {session && (
                 <>
                     <h1 className="text-xl font-semibold">
-                        <div className="text-sm text-gray-600 mr-2">
+                        <div className="text-sm text-gray-600 mr-2 ml-8">
                             Welcome, {session.user?.name}{" "}
                         </div>
                     </h1>
