@@ -71,7 +71,7 @@ export default function LoginPage() {
                         Username
                     </label>
                     <input
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        className="text-gray-900 bg-white placeholder-gray-400 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                         placeholder="Enter your username"
                         onChange={(e) => setUsername(e.target.value)}
                     />
@@ -89,7 +89,7 @@ export default function LoginPage() {
                     </label>
                     <input
                         type="password"
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        className="text-gray-900 bg-white placeholder-gray-400 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                         placeholder="Enter your password"
                         onChange={(e) => setPassword(e.target.value)}
                     />
