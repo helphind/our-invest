@@ -132,3 +132,14 @@ export async function getAvailableAmountForLoan() {
 
     return availableAmount;
 }
+
+export async function getAmountsOnHold() {
+    const remainingPrincipal = await prisma.loan.aggregate({
+        _sum: {
+            remainingPrincipal: true,
+        },
+        where: { status: "HOLD" },
+    });
+
+    return Number(remainingPrincipal._sum.remainingPrincipal || 0)
+}

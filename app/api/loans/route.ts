@@ -1,3 +1,4 @@
+import { EMIStatus, LoanStatus } from "@/app/generated/prisma/enums";
 import { createEmiSchedule } from "@/app/services/emi.service";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
@@ -40,12 +41,12 @@ export async function PUT(request: Request) {
 
         let loan;
 
-        if (status === "CLOSED") {
+        if (status === LoanStatus.CLOSED) {
             await prisma.$transaction(async (tx) => {
                 loan = await tx.loan.update({
                     where: { id },
                     data: {
-                        status: "CLOSED",
+                        status: LoanStatus.CLOSED,
                         remainingPayable: 0,
                         remainingPrincipal: 0,
                     },
@@ -54,21 +55,28 @@ export async function PUT(request: Request) {
                 await tx.eMI.updateMany({
                     where: {
                         loanId: id,
-                        status: "PENDING",
+                        status: EMIStatus.PENDING,
                     },
                     data: {
-                        status: "PAID",
+                        status: EMIStatus.PAID,
                         paidDate: new Date(),
                     },
                 });
             });
         } else {
+            const paidEmiCount = await prisma.eMI.count({
+                where: {
+                    loanId: id,
+                    status: EMIStatus.PAID,
+                },
+            });
+
             loan = await prisma.loan.update({
                 where: { id },
                 data: formattedData,
             });
 
-            if (status !== "HOLD") {
+            if (paidEmiCount === 0) {
                 await createEmiSchedule(loan);
             }
         }
@@ -97,6 +105,7 @@ function getDataFromRequest(loanRequestData: any) {
     const principal = parseFloat(loanRequestData.amount);
     const loanType = loanRequestData.loanType;
     const emiStartMonth = loanRequestData.emiStartMonth;
+    const status = loanRequestData.status || LoanStatus.ACTIVE;
 
     const startDate = new Date(`${emiStartMonth}-01`);
 
@@ -128,5 +137,6 @@ function getDataFromRequest(loanRequestData: any) {
         emiAmount,
         startDate,
         loanType,
+        status
     };
 }

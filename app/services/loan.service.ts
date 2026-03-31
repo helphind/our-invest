@@ -7,11 +7,11 @@ export async function getAllLoans() {
                 select: {
                     name: true,
                 },
-            },            
+            },
         },
         orderBy: {
-            startDate: 'desc'
-        }
+            startDate: "desc",
+        },
     });
 
     return loans.map((loan) => ({
@@ -39,6 +39,7 @@ export async function getActiveLoans() {
     });
 }
 
+
 export async function getActiveLoansCount() {
     return prisma.loan.count({
         where: { status: "ACTIVE", loanType: "NORMAL" },
@@ -60,5 +61,17 @@ export async function getHoldLoansCount() {
 export async function getActiveInstantLoansCount() {
     return prisma.loan.count({
         where: { status: "ACTIVE", loanType: "INSTANT" },
+    });
+}
+
+export async function getClosedInstantLoansCount() {
+    return prisma.loan.count({
+        where: { status: "CLOSED", loanType: "INSTANT" },
+    });
+}
+
+export async function getHoldInstantLoansCount() {
+    return prisma.loan.count({
+        where: { status: "HOLD", loanType: "INSTANT" },
     });
 }
