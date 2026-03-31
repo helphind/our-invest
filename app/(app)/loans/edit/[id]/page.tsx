@@ -21,7 +21,7 @@ export default function EditLoanPage({ params }: { params: { id: string } }) {
 
     const router = useRouter();
 
-    const loanRequest = async (e: any) => {
+    const updateLoanRequest = async (e: any) => {
         e.preventDefault();
         setLoading(true);
 
@@ -86,7 +86,7 @@ export default function EditLoanPage({ params }: { params: { id: string } }) {
         <div>
             <h2 className="text-2xl font-bold mb-6">Loan Request Details</h2>
             {loading && <Loader />}
-            <form onSubmit={loanRequest}>
+            <form onSubmit={updateLoanRequest}>
                 <div className="bg-white p-6 rounded-xl shadow max-w-md">
                     <div className="mb-4">
                         <label className="block mb-2">Member ID</label>

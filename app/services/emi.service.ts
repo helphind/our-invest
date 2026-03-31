@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { EMIStatus } from "../generated/prisma/enums";
 
 export async function createEmiSchedule(loan: any) {
     const principal = Number(loan.principal);
@@ -37,7 +38,7 @@ export async function createEmiSchedule(loan: any) {
             principal: Number(principalPart.toFixed(2)),
             interest: Number(interest.toFixed(2)),
             dueDate: emiStartDate,
-            status: "PENDING",
+            status: EMIStatus.PENDING,
         });
     }
 
