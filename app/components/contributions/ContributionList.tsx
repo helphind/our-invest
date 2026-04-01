@@ -11,13 +11,9 @@ import { useEffect, useState } from "react";
 import Loader from "../ui/Loader";
 import { useSession } from "next-auth/react";
 import { Role } from "@/app/generated/prisma/enums";
+import ResponsiveDataView from "../ui/ResponsiveDataView";
+import { StatusStyles } from "@/config/status.style";
 
-const statusStyles: Record<string, string> = {
-    PENDING: "bg-yellow-200 text-yellow-800",
-    PAID: "bg-green-200 text-green-800",
-    OVERDUE: "bg-red-200 text-red-800",
-    SKIPPED: "bg-gray-200 text-gray-700",
-};
 
 type Props = {
     contributions: any[];
@@ -37,7 +33,9 @@ export default function ContributionList({
     const [filterMonth, setFilterMonth] = useState(
         new Date().toISOString().slice(0, 7),
     );
-    const [filteredContributions, setFilteredContributions] = useState<any[]>([]);
+    const [filteredContributions, setFilteredContributions] = useState<any[]>(
+        [],
+    );
     const [selected, setSelected] = useState<string[]>([]);
 
     const { data: session } = useSession();
@@ -77,6 +75,27 @@ export default function ContributionList({
             setLoader(false);
             console.error(`Error marking contribution as ${status}:`, error);
             toast.error(`Failed to mark contribution as ${status}`);
+        }
+    };
+
+     const deleteContribution = async (id: string) => {
+        setLoader(true);
+        try {
+            const response = await fetch(`/api/contributions/${id}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete contribution`);
+            }
+
+            setLoader(false);
+            toast.success(`Contribution deleted successfully`);
+            onRefresh();
+        } catch (error) {
+            setLoader(false);
+            console.error(`Error deleting contribution ${id}:`, error);
+            toast.error(`Failed to delete contribution`);
         }
     };
 
@@ -139,55 +158,136 @@ export default function ContributionList({
         handleStatusFilter("ALL"); // your function
     }, []);
 
+    const columns = [
+        {
+            key: "member",
+            label: "Name",
+            render: (member: any) => member?.name || "N/A",
+        },
+        {
+            key: "month",
+            label: "Month",
+            render: (month: string) => formatMonth(month),
+        },
+        {
+            key: "amount",
+            label: "Amount",
+            render: (amount: number) => currency.format(amount),
+        },
+        {
+            key: "status",
+            label: "Status",
+            render: (status: string) => (
+                <span
+                    className={`min-w-25 inline-flex justify-center py-2 rounded-full text-center text-xs font-medium ${
+                        StatusStyles[status] || "bg-gray-100 text-gray-600"
+                    }`}
+                >
+                    {status}
+                </span>
+            ),
+        },
+        {
+            key: "id",
+            label: "Action",
+            render: (id: string, row: any) =>
+                row.status === "PENDING" && (
+                    <div className="w-full flex gap-2">
+                        <button
+                            onClick={() => updateStatus(row.id, "PAID")}
+                            className="px-4 py-1 text-sm bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+                        >
+                            Mark as Paid
+                        </button>
+                        {isAdmin && (<>
+                            <button
+                                onClick={() => updateStatus(row.id, "SKIPPED")}
+                                className="px-4 py-1 text-sm bg-gray-600 text-white rounded-full hover:bg-gray-700 transition"
+                            >
+                                Skip Contribution
+                            </button>
+
+                            <button
+                                onClick={() => deleteContribution(row.id)}
+                                className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
+                            >
+                                Delete
+                            </button>
+                            </>
+                        )}
+                    </div>
+                ),
+        },
+    ];
+
     return (
         <div>
             {loader && <Loader />}
-            <div className="header flex">
-                <h2 className="text-2xl font-bold mb-6">{title}</h2>
 
-                <div className="flex ml-auto mr-5">
-                    <div className="flex space-x-2 mb-4">
+            <div className="flex flex-col gap-4 mb-6">
+                {/* 🔹 Top Row */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    {/* Title */}
+                    <h2 className="text-2xl font-bold text-gray-900">
+                        {title}
+                    </h2>
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-2">
+                        {isAdmin && (
+                            <LinkBtn
+                                href="/contributions/generate"
+                                btnType="red"
+                            >
+                                Generate
+                            </LinkBtn>
+                        )}
+                        <LinkBtn href="/contributions/all" btnType="green">
+                            Show All
+                        </LinkBtn>
+                        <LinkBtn href="/contributions/add">Add Contribution</LinkBtn>
+                    </div>
+                </div>
+
+                {/* 🔹 Filters Row */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    {/* Status Filters */}
+                    <div className="flex flex-wrap gap-2">
                         {["ALL", "PAID", "PENDING"].map((f) => (
                             <button
                                 key={f}
                                 onClick={() => handleStatusFilter(f)}
-                                className={`px-4 py-2 rounded-lg text-sm ${
-                                    filterStatus === f
-                                        ? "bg-blue-600 text-white"
-                                        : "bg-gray-100"
-                                }`}
+                                className={`px-4 py-2 rounded-xl text-sm font-medium transition
+            ${
+                filterStatus === f
+                    ? "bg-blue-600 text-white shadow"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
                             >
                                 {f}
                             </button>
                         ))}
                     </div>
 
+                    {/* Month Filter */}
                     {listType === "ALL" && (
-                        <div className="flex ml-4">
+                        <div>
                             <input
                                 type="month"
                                 value={filterMonth}
-                                onChange={(e) => {
-                                    handleMonthlyFilter(e.target.value);
-                                }}
+                                onChange={(e) =>
+                                    handleMonthlyFilter(e.target.value)
+                                }
+                                className="px-3 py-2 rounded-xl border border-gray-300 text-sm 
+          bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     )}
                 </div>
-                <div className="flex ml-auto gap-3">
-                    {isAdmin && (
-                        <LinkBtn href="/contributions/generate" btnType="red">
-                            Generate
-                        </LinkBtn>
-                    )}
-                    <LinkBtn href="/contributions/all" btnType="green">
-                        All
-                    </LinkBtn>
-                    <LinkBtn href="/contributions/add">Add</LinkBtn>
-                </div>
             </div>
 
-            {isAdmin && (
+
+            {/*isAdmin && (
                 <div className="flex justify-between mb-4">
                     <button
                         onClick={handleMultiMarkPaid}
@@ -197,9 +297,15 @@ export default function ContributionList({
                         {loader ? "Updating..." : "Mark as Paid"}
                     </button>
                 </div>
-            )}
+            )*/}
 
             <div className="bg-white rounded-xl shadow overflow-hidden">
+                <ResponsiveDataView
+                    columns={columns}
+                    data={filteredContributions}
+                    mobileGridClass="grid-cols-1"
+                />
+                {/*
                 <table className="w-full">
                     <thead className="bg-gray-50">
                         <tr>
@@ -295,6 +401,7 @@ export default function ContributionList({
                         ))}
                     </tbody>
                 </table>
+                */}
             </div>
         </div>
     );

@@ -1,11 +1,8 @@
 "use client";
 
 import Loader from "@/app/components/ui/Loader";
-import {
-    currency,
-    formatDate,
-    formatMonth,
-} from "@/app/services/utility.service";
+import ResponsiveDataView from "@/app/components/ui/ResponsiveDataView";
+import { currency, formatDate, formatMonth } from "@/app/services/utility.service";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -61,6 +58,67 @@ export default function ViewLoanPage({ params }: { params: { id: string } }) {
             toast.error("Failed to mark EMI as Paid");
         }
     };
+
+    const columns = [
+        {
+            key: "installmentNo",
+            label: "S.No",
+            render: (installmentNo: number) => installmentNo,
+        },
+        {
+            key: "dueDate",
+            label: "Due Month",
+            render: (dueDate: Date) => formatMonth(dueDate),
+        },
+        {
+            key: "amount",
+            label: "EMI",
+            render: (amount: number) => currency.format(amount),
+        },
+        {
+            key: "principal",
+            label: "Principal",
+            render: (principal: number) => currency.format(principal),
+        },
+        {
+            key: "interest",
+            label: "Interest",
+            render: (interest: number) => currency.format(interest),
+        },
+        {
+            key: "paidDate",
+            label: "Paid date",
+            render: (paidDate: Date) =>
+                paidDate ? formatDate(paidDate) : "--",
+        },
+        {
+            key: "status",
+            label: "Status",
+            render: (status: string) =>
+                status === "PAID" ? (
+                    <span className="inline-flex min-w-25 justify-center bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                        Paid
+                    </span>
+                ) : (
+                    <div className="inline-flex min-w-25 justify-center bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs cursor-pointer">
+                        Pending
+                    </div>
+                ),
+        },
+        {
+            key: "id",
+            label: "Action",
+            render: (id: string, row: any) =>
+                row.status !== "PAID" && (
+                    <div
+                        className="inline-flex min-w-25 justify-center bg-green-600 text-white px-2 py-1 rounded-full text-xs cursor-pointer"
+                        onClick={() => handleEmi(row)}
+                    >
+                        Mark as Paid
+                    </div>
+                ),
+        },
+    ];
 
     return (
         <div>
@@ -184,6 +242,12 @@ export default function ViewLoanPage({ params }: { params: { id: string } }) {
                     </h2>
 
                     <div className="overflow-auto">
+                        <ResponsiveDataView
+                            columns={columns}
+                            data={emiSchedule}
+                            mobileGridClass="grid-cols-2"
+                        />
+                        {/* 
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b text-left">
@@ -234,6 +298,7 @@ export default function ViewLoanPage({ params }: { params: { id: string } }) {
                                 ))}
                             </tbody>
                         </table>
+                        */}
                     </div>
                 </div>
             )}

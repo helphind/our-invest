@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { currency } from "../../services/utility.service";
+import ResponsiveDataView from "@/app/components/ui/ResponsiveDataView";
 
 export default function EmiCalculator() {
     const [amount, setAmount] = useState(500000);
@@ -48,6 +49,34 @@ export default function EmiCalculator() {
 
         setSchedule(rows);
     };
+
+    const columns = [
+        {
+            key: "month",
+            label: "Month",
+        },
+
+        {
+            key: "principal",
+            label: "Principal From EMI",
+            render: (principal: number) => currency.format(principal),
+        },
+        {
+            key: "interest",
+            label: "Interest From EMI",
+            render: (Interest: number) => currency.format(Interest),
+        },
+        {
+            key: "emi",
+            label: "EMI",
+            render: (emi: number) => currency.format(emi),
+        },
+        {
+            key: "balance",
+            label: "Remaining Principal",
+            render: (balance: number) => currency.format(balance),
+        },
+    ];
 
     return (
         <div className=" p-6 space-y-8">
@@ -134,31 +163,7 @@ export default function EmiCalculator() {
                     </h2>
 
                     <div className="overflow-auto">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b text-left">
-                                    <th className="py-2">Month</th>
-                                    <th>EMI</th>
-                                    <th>Principal</th>
-                                    <th>Interest</th>
-                                    <th>Balance</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {schedule.map((row) => (
-                                    <tr key={row.month} className="border-b">
-                                        <td className="py-2">{row.month}</td>
-                                        <td>{currency.format(row.emi)}</td>
-                                        <td>
-                                            {currency.format(row.principal)}
-                                        </td>
-                                        <td>{currency.format(row.interest)}</td>
-                                        <td>{currency.format(row.balance)}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <ResponsiveDataView columns={columns} data={schedule} />
                     </div>
                 </div>
             )}

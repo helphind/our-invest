@@ -108,6 +108,7 @@ export default function LoginPage() {
                     Login
                 </button>
 
+                {/* 
 
                 <div className="text-center">
                     <Link
@@ -117,6 +118,7 @@ export default function LoginPage() {
                         Forget Password
                     </Link>
                 </div>
+                 */}
             </form>
         </div>
     );
