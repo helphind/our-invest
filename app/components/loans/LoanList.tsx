@@ -130,9 +130,27 @@ export default function LoanList({ loans }: { loans: any[] }) {
 
     return (
         <div>
-            <div className="header flex">
-                <h2 className="text-2xl font-bold mb-6">Loans</h2>
-                {isAdmin && <LinkBtn href="/loans/create">Create Loan</LinkBtn>}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                {/* Left Section */}
+                <div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+                        Loans
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">
+                        Manage and track loans
+                    </p>
+                </div>
+
+                {/* Right Section */}
+                {isAdmin && (
+                    <LinkBtn
+                        href="/loans/create"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-blue-600 text-white text-sm font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                    >
+                        <span className="text-lg">＋</span>
+                        New Loan
+                    </LinkBtn>
+                )}
             </div>
 
             <div className="bg-white rounded-xl shadow overflow-hidden">
