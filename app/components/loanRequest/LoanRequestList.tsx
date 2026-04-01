@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import LinkBtn from "../ui/LinkBtn";
 import { currency } from "@/app/services/utility.service";
+import ResponsiveDataView from "../ui/ResponsiveDataView";
+import { StatusStyles } from "@/config/status.style";
 
 export default function LoanRequestList({
     loanRequests,
@@ -67,67 +69,88 @@ export default function LoanRequestList({
         }
     };
 
+    const columns = [
+        {
+            key: "member",
+            label: "Name",
+            render: (member: any) => member?.name || "N/A",
+        },
+        {
+            key: "amount",
+            label: "Amount",
+            render: (amount: number) => currency.format(amount),
+        },
+        {
+            key: "loanType",
+            label: "Loan Type",
+        },
+
+        {
+            key: "status",
+            label: "Status",
+            render: (status: string) => (
+                <span
+                    className={`min-w-25 inline-flex justify-center py-2 rounded-full text-center text-xs font-medium ${
+                        StatusStyles[status] || "bg-green-100 text-green-600"
+                    }`}
+                >
+                    {status}
+                </span>
+            ),
+        },
+        {
+            key: "id",
+            label: "Action",
+            render: (id: string, loanRequest: any) =>
+                loanRequest.status === "PENDING" && (
+                    <div className="flex gap-2">
+                        <Link
+                            href={`/loan-requests/${id}`}
+                            className="px-4 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+                        >
+                            Edit
+                        </Link>
+
+                        <button
+                            onClick={() => handleDelete(id)}
+                            className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
+                        >
+                            Delete
+                        </button>
+
+                        <Link
+                            href={`/loan-requests/approvals/${id}`}
+                            className="px-4 py-1 text-sm bg-amber-500 text-white rounded-full hover:bg-amber-600 transition"
+                        >
+                            Approvals
+                        </Link>
+                    </div>
+                ),
+        },
+    ];
+
     return (
         <div>
-            <div className="header flex">
-                <h2 className="text-2xl font-bold mb-6">Loans</h2>
-                <LinkBtn href="/loan-requests/create">
-                    Create Loan Request
+            <div className="flex items-center justify-between mb-6">
+                <div>
+                    <h2 className="text-2xl font-semibold text-gray-800">
+                        Loans
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                        Manage and track loan requests
+                    </p>
+                </div>
+
+                <LinkBtn
+                    href="/loan-requests/create"
+                    className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm hover:bg-blue-700 transition"
+                >
+                    + Create Loan Request
                 </LinkBtn>
             </div>
 
             <div className="bg-white rounded-xl shadow overflow-hidden">
-                <table className="w-full">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="p-4 text-left">Name</th>
-                            <th className="p-4 text-left">Amount</th>
-                            <th className="p-4 text-left">Loan Type</th>
-                            <th className="p-4 text-left">Status</th>
-                            <th className="p-4 text-left">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loanRequests.map((loanRequest, i) => (
-                            <tr key={i} className="border-t">
-                                <td className="p-4">
-                                    {loanRequest.member.name}
-                                </td>
-                                <td className="p-4">{currency.format(loanRequest.amount)}</td>
-                                <td className="p-4">{loanRequest.loanType}</td>
-                                <td className="p-4">{loanRequest.status}</td>
-                                <td className="p-4 flex gap-2">
-                                    {loanRequest.status === "PENDING" && (
-                                        <>
-                                            <Link
-                                                href={`/loan-requests/edit/${loanRequest.id}`}
-                                                className="px-4 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
-                                            >
-                                                Edit
-                                            </Link>
-
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(loanRequest.id)
-                                                }
-                                                className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
-                                            >
-                                                Delete
-                                            </button>                            
-
-                                            <Link
-                                                href={`/loan-requests/approvals/${loanRequest.id}`}
-                                                className="px-4 py-1 text-sm bg-amber-500 text-white rounded-full hover:bg-amber-600 transition"
-                                            >
-                                                Approvals
-                                            </Link>
-                                        </>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <ResponsiveDataView data={loanRequests} columns={columns} />
             </div>
         </div>
     );

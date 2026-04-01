@@ -1,6 +1,37 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
+export async function GET(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
+) {
+    try {
+        const { id } = await params;
+
+        const loanRequest = await prisma.loanRequest.findUnique({
+            where: { id },
+            include: {
+                member: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+        });
+
+        return NextResponse.json(loanRequest);
+    } catch (error) {
+        return NextResponse.json(
+            {
+                message: "Failed to fetch loan request details",
+                error: error,
+            },
+            { status: 500 },
+        );
+    }
+}
+
+// Need to check this method is used or not
 export async function PUT(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
