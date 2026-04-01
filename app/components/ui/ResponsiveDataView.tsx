@@ -1,10 +1,12 @@
 "use client";
 
 import { ResponsiveDataViewProps } from "@/app/interface/DataView.interface";
+import { StatusStyles } from "@/config/status.style";
 
 export default function ResponsiveDataView<T extends Record<string, any>>({
     data = [],
     columns = [],
+    mobileGridClass,
 }: ResponsiveDataViewProps<T>) {
     return (
         <div className="w-full">
@@ -48,34 +50,53 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
 
             {/* ================= MOBILE CARDS ================= */}
 
-            <div className="md:hidden space-y-4">
+            <div className="md:hidden space-y-4 px-4">
                 {data.map((row, i) => (
                     <div
                         key={i}
                         className="bg-white rounded-2xl shadow-sm border p-4 space-y-3"
                     >
-                        {/* 🔹 Header (Primary Info) */}
-                        <div className="flex justify-between items-center">
-                            <h3 className="font-semibold text-gray-900 text-base">
-                                {columns[0]?.render
-                                    ? columns[0].render(
-                                          row[columns[0].key],
-                                          row,
-                                      )
-                                    : row[columns[0].key]}
-                            </h3>
+                        {/* 🔹 Header */}
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="font-semibold text-gray-900">
+                                    {columns[0]?.render
+                                        ? columns[0].render(
+                                              row[columns[0].key],
+                                              row,
+                                          )
+                                        : row[columns[0].key]}
+                                </h3>
 
-                            {/* Example badge (optional) */}
+                                <div className="text-xs text-gray-500">
+                                    {columns[1]?.label}:{" "}
+                                    {columns[1]?.render
+                                        ? columns[1].render(
+                                              row[columns[1].key],
+                                              row,
+                                          )
+                                        : row[columns[1].key]}
+                                </div>
+                            </div>
+
+                            {/* Status badge */}
                             {row.status && (
-                                <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-600">
+                                <span
+                                    className={`text-xs px-2 py-1 rounded-full  ${
+                                        StatusStyles[row.status] ||
+                                        "bg-gray-100 text-gray-600"
+                                    }`}
+                                >
                                     {row.status}
                                 </span>
                             )}
                         </div>
 
-                        {/* 🔹 Content (Grid Layout) */}
-                        <div className="grid grid-cols-2 gap-2">
-                            {columns.slice(1).map((col) => (
+                        {/* 🔹 Details */}
+                        <div
+                            className={`grid ${mobileGridClass || "grid-cols-2"} gap-3`}
+                        >
+                            {columns.slice(2).map((col) => (
                                 <div key={String(col.key)}>
                                     <div className="text-xs text-gray-500">
                                         {col.label}
@@ -88,6 +109,7 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
                                 </div>
                             ))}
                         </div>
+                      
                     </div>
                 ))}
             </div>

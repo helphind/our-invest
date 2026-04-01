@@ -7,6 +7,8 @@ import LinkBtn from "../ui/LinkBtn";
 import { currency, formatMonth } from "@/app/services/utility.service";
 import { useSession } from "next-auth/react";
 import { Role } from "@/app/generated/prisma/enums";
+import ResponsiveDataView from "../ui/ResponsiveDataView";
+import { StatusStyles } from "@/config/status.style";
 
 export default function LoanList({ loans }: { loans: any[] }) {
     const router = useRouter();
@@ -39,6 +41,93 @@ export default function LoanList({ loans }: { loans: any[] }) {
         }
     };
 
+    const columns = [
+        {
+            key: "member",
+            label: "Name",
+            render: (member: any) => member?.name || "N/A",
+        },
+        {
+            key: "principal",
+            label: "Principal",
+            render: (principal: number) => currency.format(principal),
+        },
+        {
+            key: "interestRate",
+            label: "Interest Rate",
+        },
+        {
+            key: "durationMonths",
+            label: "Duration (In Months)",
+        },
+        {
+            key: "startDate",
+            label: "EMI Start Month",
+            render: (startDate: Date) => formatMonth(startDate),
+        },
+        {
+            key: "emiAmount",
+            label: "EMI",
+            render: (emiAmount: number) => currency.format(emiAmount),
+        },
+        {
+            key: "totalPayable",
+            label: "Total Payable",
+            render: (totalPayable: number) => currency.format(totalPayable),
+        },
+        {
+            key: "remainingPayable",
+            label: "Remaining Payable",
+            render: (remainingPayable: number) =>
+                currency.format(remainingPayable),
+        },
+        {
+            key: "status",
+            label: "Status",
+            render: (status: string) => (
+                <span
+                    className={`min-w-25 inline-flex justify-center py-2 rounded-full text-center text-xs font-medium ${
+                        StatusStyles[status] || "bg-green-100 text-green-600"
+                    }`}
+                >
+                    {status}
+                </span>
+            ),
+        },
+        {
+            key: "id",
+            label: "Action",
+            render: (id: string, loan: any) => (
+                <div className="flex gap-2">
+                    <Link
+                        href={`/loans/view/${loan.id}`}
+                        className="px-4 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+                    >
+                        View
+                    </Link>
+
+                    {isAdmin && loan.status !== "CLOSED" && (
+                        <>
+                            <Link
+                                href={`/loans/edit/${loan.id}`}
+                                className="px-4 py-1 text-sm bg-amber-500 text-white rounded-full hover:bg-amber-600 transition"
+                            >
+                                Edit
+                            </Link>
+
+                            <button
+                                onClick={() => handleDelete(loan.id)}
+                                className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
+                            >
+                                Delete
+                            </button>
+                        </>
+                    )}
+                </div>
+            ),
+        },
+    ];
+
     return (
         <div>
             <div className="header flex">
@@ -47,6 +136,12 @@ export default function LoanList({ loans }: { loans: any[] }) {
             </div>
 
             <div className="bg-white rounded-xl shadow overflow-hidden">
+                <ResponsiveDataView
+                    columns={columns}
+                    data={loans}
+                    mobileGridClass="grid-cols-2"
+                />
+                {/*
                 <table className="w-full">
                     <thead className="bg-gray-50">
                         <tr>
@@ -117,6 +212,7 @@ export default function LoanList({ loans }: { loans: any[] }) {
                         ))}
                     </tbody>
                 </table>
+                */}
             </div>
         </div>
     );

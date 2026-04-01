@@ -5,14 +5,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function EditLoanRequestPage({ params }: { params: { id: string } })  {
+export default function EditLoanRequestPage({
+    params,
+}: {
+    params: { id: string };
+}) {
     const [id, setId] = useState("");
     const [amount, setAmount] = useState(500000);
-    const [duration, setDuration] = useState(60);
-    const [loading, setLoading] = useState(false);
     const [memberId, setMemberId] = useState("");
     const [loanType, setLoanType] = useState("NORMAL");
     const [members, setMembers] = useState([]);
+
+    const [loading, setLoading] = useState(false);
 
     const router = useRouter();
 
@@ -20,13 +24,12 @@ export default function EditLoanRequestPage({ params }: { params: { id: string }
         e.preventDefault();
         setLoading(true);
 
-        const res = await fetch("/api/loans", {
+        const res = await fetch("/api/loan-request", {
             method: "PUT",
             body: JSON.stringify({
                 id,
                 memberId,
                 amount: +amount,
-                duration: +duration,
                 loanType,
             }),
         });
@@ -34,11 +37,11 @@ export default function EditLoanRequestPage({ params }: { params: { id: string }
         setLoading(false);
 
         if (res.ok) {
-            toast.success("Loan request created successfully");
-            router.push("/loans");
+            toast.success("Loan request updated successfully");
+            router.push("/loan-requests");
         } else {
             console.error("Loan request failed");
-            toast.error("Failed to create loan request");
+            toast.error("Failed to update loan request");
         }
     };
 
@@ -55,12 +58,13 @@ export default function EditLoanRequestPage({ params }: { params: { id: string }
             const { id } = await params;
 
             setLoading(true);
-            const res = await fetch(`/api/loans/${id}`);
+            const res = await fetch(`/api/loan-request/${id}`);
             const data = await res.json();
 
+            console.log("loanRequest", data);
+
             setId(data.id);
-            setAmount(data.principal);
-            setDuration(data.durationMonths);
+            setAmount(data.amount);
             setMemberId(data.memberId);
             setLoanType(data.loanType);
             setLoading(false);
@@ -97,18 +101,6 @@ export default function EditLoanRequestPage({ params }: { params: { id: string }
                             type="number"
                             value={amount}
                             onChange={(e) => setAmount(Number(e.target.value))}
-                            className="w-full border rounded-lg p-2"
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block mb-2">
-                            Duration (In Months)
-                        </label>
-                        <input
-                            type="number"
-                            value={duration}
-                            onChange={(e) => setDuration(Number(e.target.value))}
                             className="w-full border rounded-lg p-2"
                         />
                     </div>
