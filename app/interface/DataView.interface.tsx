@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface Column<T> {
     key: keyof T | string;
     label: string;
@@ -7,6 +9,5 @@ export interface Column<T> {
 export interface ResponsiveDataViewProps<T> {
     data: T[];
     columns: Column<T>[];
-    actions?: (row: T) => React.ReactNode;
     mobileGridClass?: string; // e.g. "grid-cols-2", "grid-cols-3"
 }

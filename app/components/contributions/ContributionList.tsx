@@ -167,7 +167,7 @@ export default function ContributionList({
         {
             key: "month",
             label: "Month",
-            render: (month: string) => formatMonth(month),
+            render: (month: Date) => formatMonth(month),
         },
         {
             key: "amount",

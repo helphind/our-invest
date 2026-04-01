@@ -6,7 +6,6 @@ import { StatusStyles } from "@/config/status.style";
 export default function ResponsiveDataView<T extends Record<string, any>>({
     data = [],
     columns = [],
-    actions,
     mobileGridClass,
 }: ResponsiveDataViewProps<T>) {
     return (
@@ -85,7 +84,7 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
                                 <span
                                     className={`text-xs px-2 py-1 rounded-full  ${
                                         StatusStyles[row.status] ||
-                                        "bg-green-100 text-green-600"
+                                        "bg-gray-100 text-gray-600"
                                     }`}
                                 >
                                     {row.status}
@@ -110,29 +109,7 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
                                 </div>
                             ))}
                         </div>
-
-                        {/* 🔹 Actions */}
-                        {actions?.length && (
-                            <div className="flex justify-end gap-2 pt-3 border-t">
-                                {actions.map((action, idx) => {
-                                    if (action.show && !action.show(row))
-                                        return null;
-
-                                    return (
-                                        <button
-                                            key={idx}
-                                            onClick={() => action.onClick(row)}
-                                            className={`p-2 rounded-lg ${
-                                                action.className ||
-                                                "bg-gray-100 hover:bg-gray-200"
-                                            }`}
-                                        >
-                                            {action.icon}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        )}
+                      
                     </div>
                 ))}
             </div>
