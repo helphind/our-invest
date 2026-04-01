@@ -14,7 +14,6 @@ import { Role } from "@/app/generated/prisma/enums";
 import ResponsiveDataView from "../ui/ResponsiveDataView";
 import { StatusStyles } from "@/config/status.style";
 
-
 type Props = {
     contributions: any[];
     title: string;
@@ -78,7 +77,7 @@ export default function ContributionList({
         }
     };
 
-     const deleteContribution = async (id: string) => {
+    const deleteContribution = async (id: string) => {
         setLoader(true);
         try {
             const response = await fetch(`/api/contributions/${id}`, {
@@ -199,20 +198,23 @@ export default function ContributionList({
                         >
                             Mark as Paid
                         </button>
-                        {isAdmin && (<>
-                            <button
-                                onClick={() => updateStatus(row.id, "SKIPPED")}
-                                className="px-4 py-1 text-sm bg-gray-600 text-white rounded-full hover:bg-gray-700 transition"
-                            >
-                                Skip Contribution
-                            </button>
+                        {isAdmin && (
+                            <>
+                                <button
+                                    onClick={() =>
+                                        updateStatus(row.id, "SKIPPED")
+                                    }
+                                    className="px-4 py-1 text-sm bg-gray-600 text-white rounded-full hover:bg-gray-700 transition"
+                                >
+                                    Skip Contribution
+                                </button>
 
-                            <button
-                                onClick={() => deleteContribution(row.id)}
-                                className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
-                            >
-                                Delete
-                            </button>
+                                <button
+                                    onClick={() => deleteContribution(row.id)}
+                                    className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
+                                >
+                                    Delete
+                                </button>
                             </>
                         )}
                     </div>
@@ -245,7 +247,7 @@ export default function ContributionList({
                         <LinkBtn href="/contributions/all" btnType="green">
                             Show All
                         </LinkBtn>
-                        <LinkBtn href="/contributions/add">Add Contribution</LinkBtn>
+                        <LinkBtn href="/contributions/add">Add</LinkBtn>
                     </div>
                 </div>
 
@@ -285,7 +287,6 @@ export default function ContributionList({
                     )}
                 </div>
             </div>
-
 
             {/*isAdmin && (
                 <div className="flex justify-between mb-4">

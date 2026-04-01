@@ -131,21 +131,24 @@ export default function LoanRequestList({
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                {/* Left Section */}
                 <div>
-                    <h2 className="text-2xl font-semibold text-gray-800">
-                        Loans
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+                        Loan Requests
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 mt-1">
                         Manage and track loan requests
                     </p>
                 </div>
 
+                {/* Right Section */}
                 <LinkBtn
                     href="/loan-requests/create"
-                    className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm hover:bg-blue-700 transition"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-blue-600 text-white text-sm font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all"
                 >
-                    + Create Loan Request
+                    <span className="text-lg">＋</span>
+                    New Loan Request
                 </LinkBtn>
             </div>
 
