@@ -41,7 +41,7 @@ export default function MembersList({ members }: { members: any[] }) {
     };
 
     const columns = [
-        { key: "name", label: "Name" },        
+        { key: "name", label: "Name" },
         { key: "phone", label: "Phone" },
         { key: "email", label: "Email" },
         {
