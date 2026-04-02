@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { Role } from "@/app/generated/prisma/enums";
 import { useEffect, useState } from "react";
 import Loader from "@/app/components/ui/Loader";
+import { Action } from "@/app/interface/DataView.interface";
 
 export default function LoansPage() {
     const [loans, setLoans] = useState([]);
