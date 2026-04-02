@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import StatCard from "../../components/StatCard";
 import StatCardSkeleton from "@/app/components/StatCardSkeleton";
 
+export const dynamic = "force-dynamic";
+
 export default function DashboardPage() {
     return (
         <div className="pb-6">
