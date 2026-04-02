@@ -14,7 +14,7 @@ export interface Action<T> {
     // for link
     href?: string | ((row: T) => string);
 
-    variant: "primary" | "secondary" | "danger";
+    variant: "primary" | "secondary" | "danger" | "primaryGreen"; // for styling
     icon?: React.ReactNode;
     className?: string;
 

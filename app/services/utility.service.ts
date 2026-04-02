@@ -24,12 +24,15 @@ export const monthFieldValue = (date: Date) => {
     return new Date(date).toISOString().slice(0, 7);
 };
 
-export const getStyle = (section: string, type: string) => DashboardStyle[section][type];
+export const getStyle = (section: string, type: string) =>
+    DashboardStyle[section][type];
 
 export const getActionStyle = (variant: string) => {
     switch (variant) {
         case "primary":
             return "bg-blue-600 text-white hover:bg-blue-700";
+        case "primaryGreen":
+            return "bg-green-600 text-white hover:bg-green-700";
         case "secondary":
             return "bg-gray-100 text-gray-700 hover:bg-gray-200";
         case "danger":

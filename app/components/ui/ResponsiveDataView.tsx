@@ -2,7 +2,6 @@
 
 import { ResponsiveDataViewProps } from "@/app/interface/DataView.interface";
 import { StatusStyles } from "@/config/status.style";
-import LinkBtn from "./LinkBtn";
 import { getActionStyle } from "@/app/services/utility.service";
 import Link from "next/link";
 
@@ -70,9 +69,19 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
                             <div className="flex items-center gap-3">
                                 {/* Avatar / Initial */}
                                 <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
-                                    {String(row[columns[0].key] || "")
-                                        .charAt(0)
-                                        .toUpperCase()}
+                                
+                                    {columns[0]?.render
+                                        ? String(
+                                              columns[0].render(
+                                                  row[columns[0].key],
+                                                  row,
+                                              ),
+                                          )
+                                              .charAt(0)
+                                              .toUpperCase()
+                                        : String(row[columns[0].key])
+                                              .charAt(0)
+                                              .toUpperCase()}
                                 </div>
 
                                 <div>
