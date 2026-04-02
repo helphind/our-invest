@@ -12,7 +12,8 @@ import Loader from "../ui/Loader";
 import { useSession } from "next-auth/react";
 import { Role } from "@/app/generated/prisma/enums";
 import ResponsiveDataView from "../ui/ResponsiveDataView";
-import { StatusStyles } from "@/config/status.style";
+import { Action } from "@/app/interface/DataView.interface";
+import AddIcon from "../ui/icons/add";
 
 type Props = {
     contributions: any[];
@@ -78,6 +79,12 @@ export default function ContributionList({
     };
 
     const deleteContribution = async (id: string) => {
+        const confirmed = confirm(
+            "Are you sure you want to delete this contribution?",
+        );
+
+        if (!confirmed) return;
+
         setLoader(true);
         try {
             const response = await fetch(`/api/contributions/${id}`, {
@@ -173,52 +180,29 @@ export default function ContributionList({
             label: "Amount",
             render: (amount: number) => currency.format(amount),
         },
+    ];
+
+    const actions: Action<any>[] = [
         {
-            key: "status",
-            label: "Status",
-            render: (status: string) => (
-                <span
-                    className={`min-w-25 inline-flex justify-center py-2 rounded-full text-center text-xs font-medium ${
-                        StatusStyles[status] || "bg-gray-100 text-gray-600"
-                    }`}
-                >
-                    {status}
-                </span>
-            ),
+            label: "Mark as Paid",
+            type: "button" as const,
+            onClick: (row: any) => updateStatus(row.id, "PAID"),
+            variant: "primaryGreen",
+            hidden: (row) => row.status !== "PENDING",
         },
         {
-            key: "id",
-            label: "Action",
-            render: (id: string, row: any) =>
-                row.status === "PENDING" && (
-                    <div className="w-full flex gap-2">
-                        <button
-                            onClick={() => updateStatus(row.id, "PAID")}
-                            className="px-4 py-1 text-sm bg-green-600 text-white rounded-full hover:bg-green-700 transition"
-                        >
-                            Mark as Paid
-                        </button>
-                        {isAdmin && (
-                            <>
-                                <button
-                                    onClick={() =>
-                                        updateStatus(row.id, "SKIPPED")
-                                    }
-                                    className="px-4 py-1 text-sm bg-gray-600 text-white rounded-full hover:bg-gray-700 transition"
-                                >
-                                    Skip Contribution
-                                </button>
-
-                                <button
-                                    onClick={() => deleteContribution(row.id)}
-                                    className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
-                                >
-                                    Delete
-                                </button>
-                            </>
-                        )}
-                    </div>
-                ),
+            label: "Skip",
+            type: "button" as const,
+            onClick: (row: any) => updateStatus(row.id, "SKIPPED"),
+            variant: "secondary",
+            hidden: (row) => row.status !== "PENDING" || !isAdmin,
+        },
+        {
+            label: "Delete",
+            type: "button" as const,
+            onClick: (row: any) => deleteContribution(row.id),
+            variant: "danger",
+            hidden: (row) => row.status !== "PENDING" || !isAdmin,
         },
     ];
 
@@ -226,65 +210,110 @@ export default function ContributionList({
         <div>
             {loader && <Loader />}
 
-            <div className="flex flex-col gap-4 mb-6">
-                {/* 🔹 Top Row */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    {/* Title */}
-                    <h2 className="text-2xl font-bold text-gray-900">
-                        {title}
-                    </h2>
+            <div className="mb-6 space-y-4">
+                {/* 🔹 Header Card */}
+                <div
+                    className="
+        bg-white
+        border border-gray-200/70
+        rounded-2xl
+        p-4 sm:p-5
+        shadow-sm
+    "
+                >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        {/* Title */}
+                        <div>
+                            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
+                                {title}
+                            </h2>
+                            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                                Manage contributions and track payments
+                            </p>
+                        </div>
 
-                    {/* Actions */}
-                    <div className="flex flex-wrap gap-2">
-                        {isAdmin && (
+                        {/* Actions */}
+                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                            {isAdmin && (
+                                <LinkBtn
+                                    href="/contributions/generate"
+                                    btnType="red"
+                                    className="w-full sm:w-auto"
+                                >
+                                    Generate
+                                </LinkBtn>
+                            )}
+
                             <LinkBtn
-                                href="/contributions/generate"
-                                btnType="red"
+                                href="/contributions/all"
+                                btnType="green"
+                                className="w-full sm:w-auto"
                             >
-                                Generate
+                                Show All
                             </LinkBtn>
-                        )}
-                        <LinkBtn href="/contributions/all" btnType="green">
-                            Show All
-                        </LinkBtn>
-                        <LinkBtn href="/contributions/add">Add</LinkBtn>
+
+                            <LinkBtn
+                                href="/contributions/add"
+                                className="w-full sm:w-auto"
+                            >
+                                <AddIcon /> Add
+                            </LinkBtn>
+                        </div>
                     </div>
                 </div>
 
-                {/* 🔹 Filters Row */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    {/* Status Filters */}
-                    <div className="flex flex-wrap gap-2">
-                        {["ALL", "PAID", "PENDING"].map((f) => (
-                            <button
-                                key={f}
-                                onClick={() => handleStatusFilter(f)}
-                                className={`px-4 py-2 rounded-xl text-sm font-medium transition
-            ${
-                filterStatus === f
-                    ? "bg-blue-600 text-white shadow"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-                            >
-                                {f}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Month Filter */}
-                    {listType === "ALL" && (
-                        <div>
-                            <input
-                                type="month"
-                                value={filterMonth}
-                                onChange={(e) =>
-                                    handleMonthlyFilter(e.target.value)
-                                }
-                                className="px-3 py-2 rounded-xl border border-gray-300 text-sm 
-          bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
-                            />
+                {/* 🔹 Filters Card */}
+                <div
+                    className="
+        bg-white
+        border border-gray-200/70
+        rounded-2xl
+        p-4
+        shadow-sm
+    "
+                >
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        {/* Status Filters */}
+                        <div className="flex flex-wrap gap-2">
+                            {["ALL", "PAID", "PENDING"].map((f) => (
+                                <button
+                                    key={f}
+                                    onClick={() => handleStatusFilter(f)}
+                                    className={`
+                            px-4 py-2 rounded-xl text-sm font-medium
+                            transition-all duration-150
+                            ${
+                                filterStatus === f
+                                    ? "bg-blue-600 text-white shadow-sm"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }
+                        `}
+                                >
+                                    {f}
+                                </button>
+                            ))}
                         </div>
-                    )}
+
+                        {/* Month Filter */}
+                        {listType === "ALL" && (
+                            <div className="w-full sm:w-auto">
+                                <input
+                                    type="month"
+                                    value={filterMonth}
+                                    onChange={(e) =>
+                                        handleMonthlyFilter(e.target.value)
+                                    }
+                                    className="
+                            w-full sm:w-auto
+                            px-3 py-2 rounded-xl border border-gray-300
+                            text-sm bg-white text-gray-900
+                            focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                            transition
+                        "
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -304,6 +333,7 @@ export default function ContributionList({
                 <ResponsiveDataView
                     columns={columns}
                     data={filteredContributions}
+                    actions={actions}
                     mobileGridClass="grid-cols-1"
                 />
                 {/*

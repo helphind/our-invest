@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import ResponsiveDataView from "@/app/components/ui/ResponsiveDataView";
 import LinkBtn from "@/app/components/ui/LinkBtn";
-import Link from "next/link";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { Role } from "@/app/generated/prisma/enums";
 import { useRouter } from "next/navigation";
 import Loader from "@/app/components/ui/Loader";
+import { Action } from "@/app/interface/DataView.interface";
+import AddIcon from "@/app/components/ui/icons/add";
 
 export default function MembersPage() {
     const [members, setMembers] = useState([]);
@@ -50,15 +51,21 @@ export default function MembersPage() {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to delete member");
+                const data = await response.json();
+                throw new Error(data.message || "Failed to delete member");
             }
 
             toast.success("Member deleted successfully");
 
-            router.refresh();
-        } catch (error) {
-            console.error("Failed to delete member:", error);
-            toast.error("Failed to delete member");
+            getAllMembers();
+        } catch (error: any) {
+            if (typeof error === "string") {
+                toast.error(error);
+            } else if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error("Failed to delete member");
+            }
         }
     };
 
@@ -83,63 +90,73 @@ export default function MembersPage() {
                 </div>
             ),
         },
+    ];
+
+    const actions: Action<any>[] = [
         {
-            key: "id",
-            label: "Action",
-            render: (id: string) =>
-                isAdmin && (
-                    <div className="py-2 md:py-0 flex gap-2">
-                        <Link
-                            href={`/members/${id}`}
-                            className="px-4 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
-                        >
-                            View
-                        </Link>
-
-                        <Link
-                            href={`/members/edit/${id}`}
-                            className="px-4 py-1 text-sm bg-amber-500 text-white rounded-full hover:bg-amber-600 transition"
-                        >
-                            Edit
-                        </Link>
-
-                        <button
-                            onClick={() => handleDelete(id)}
-                            className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                ),
+            label: "View",
+            type: "link" as const,
+            href: (row: any) => `/members/${row.id}`,
+            variant: "primary",
+        },
+        {
+            label: "Edit",
+            type: "link" as const,
+            href: (row: any) => `/members/edit/${row.id}`,
+            variant: "secondary",
+        },
+        {
+            label: "Delete",
+            type: "button" as const,
+            onClick: (row: any) => handleDelete(row.id),
+            variant: "danger",
         },
     ];
 
     return (
         <div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                {/* Left Section */}
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
+                    <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">
                         Members
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 mt-1">
                         Manage and view all members
                     </p>
                 </div>
+
+                {/* Right Section */}
                 {isAdmin && (
-                    <LinkBtn
-                        href="/members/add"
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl 
-    bg-blue-600 text-white text-sm font-medium 
-    hover:bg-blue-700 transition"
-                    >
-                        ➕ Add Member
-                    </LinkBtn>
+                    <div className="w-full sm:w-auto">
+                        <LinkBtn
+                            href="/members/add"
+                            className="
+                w-full sm:w-auto
+                inline-flex items-center justify-center gap-2
+                px-4 py-2.5
+                rounded-xl
+                bg-blue-600 text-white text-sm font-medium
+                shadow-sm
+                hover:bg-blue-700 hover:shadow-md
+                active:scale-[0.98]
+                transition-all duration-200
+            "
+                        >
+                            <AddIcon /> Add Member
+                        </LinkBtn>
+                    </div>
                 )}
             </div>
 
             <div className="bg-white rounded-xl shadow overflow-hidden">
                 {loading && <Loader />}
-                <ResponsiveDataView columns={columns} data={members} />
+                <ResponsiveDataView
+                    columns={columns}
+                    data={members}
+                    actions={actions}
+                    mobileGridClass="grid-cols-1"
+                />
             </div>
         </div>
     );

@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loader from "@/app/components/ui/Loader";
+import { Action } from "@/app/interface/DataView.interface";
 
 export default function LoanRequestPage() {
     const [loanRequests, setLoanRequests] = useState([]);
@@ -54,7 +55,7 @@ export default function LoanRequestPage() {
 
             toast.success("Loan request deleted successfully");
 
-            router.refresh();
+            getLoanRequests();
         } catch (error) {
             console.error("Failed to delete loan request:", error);
             toast.error("Failed to delete loan request");
@@ -105,48 +106,30 @@ export default function LoanRequestPage() {
             key: "loanType",
             label: "Loan Type",
         },
+    ];
+
+    const actions: Action<any>[] = [
+        {
+            label: "Edit",
+            type: "link" as const,
+            href: (row: any) => `/loan-requests/${row.id}`,
+            variant: "primary",
+            hidden: (row) => row.status !== "PENDING",
+        },
 
         {
-            key: "status",
-            label: "Status",
-            render: (status: string) => (
-                <span
-                    className={`min-w-25 inline-flex justify-center py-2 rounded-full text-center text-xs font-medium ${
-                        StatusStyles[status] || "bg-green-100 text-green-600"
-                    }`}
-                >
-                    {status}
-                </span>
-            ),
+            label: "Approvals",
+            type: "link" as const,
+            href: (row: any) => `/loan-requests/approvals/${row.id}`,
+            variant: "secondary",
+            hidden: (row) => row.status !== "PENDING",
         },
         {
-            key: "id",
-            label: "Action",
-            render: (id: string, loanRequest: any) =>
-                loanRequest.status === "PENDING" && (
-                    <div className="flex gap-2">
-                        <Link
-                            href={`/loan-requests/${id}`}
-                            className="px-4 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
-                        >
-                            Edit
-                        </Link>
-
-                        <button
-                            onClick={() => handleDelete(id)}
-                            className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
-                        >
-                            Delete
-                        </button>
-
-                        <Link
-                            href={`/loan-requests/approvals/${id}`}
-                            className="px-4 py-1 text-sm bg-amber-500 text-white rounded-full hover:bg-amber-600 transition"
-                        >
-                            Approvals
-                        </Link>
-                    </div>
-                ),
+            label: "Delete",
+            type: "button" as const,
+            onClick: (row: any) => handleDelete(row.id),
+            variant: "danger",
+            hidden: (row) => row.status !== "PENDING",
         },
     ];
 
@@ -175,7 +158,11 @@ export default function LoanRequestPage() {
 
             <div className="bg-white rounded-xl shadow overflow-hidden">
                 {loading && <Loader />}
-                <ResponsiveDataView data={loanRequests} columns={columns} />
+                <ResponsiveDataView
+                    data={loanRequests}
+                    columns={columns}
+                    actions={actions}
+                />
             </div>
         </div>
     );

@@ -1,7 +1,5 @@
 "use client";
 import ResponsiveDataView from "@/app/components/ui/ResponsiveDataView";
-import LoanList from "../../components/loans/LoanList";
-import { getAllLoans } from "../../services/loan.service";
 import LinkBtn from "@/app/components/ui/LinkBtn";
 import Link from "next/link";
 import { StatusStyles } from "@/config/status.style";
@@ -9,15 +7,14 @@ import { currency, formatMonth } from "@/app/services/utility.service";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { Role } from "@/app/generated/prisma/enums";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loader from "@/app/components/ui/Loader";
+import { Action } from "@/app/interface/DataView.interface";
 
 export default function LoansPage() {
     const [loans, setLoans] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const router = useRouter();
     const { data: session } = useSession();
 
     const isAdmin = session?.user?.role === Role.ADMIN;
@@ -42,7 +39,7 @@ export default function LoansPage() {
 
     const handleDelete = async (id: string) => {
         const confirmed = confirm(
-            "Are you sure you want to delete this Loan Request?",
+            "Are you sure you want to delete this Loan details?",
         );
 
         if (!confirmed) return;
@@ -53,15 +50,15 @@ export default function LoansPage() {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to delete loan request");
+                throw new Error("Failed to delete loan details");
             }
 
-            toast.success("Loan request deleted successfully");
+            toast.success("Loan details deleted successfully");
 
-            router.refresh();
+            getAllLoans();
         } catch (error) {
-            console.error("Failed to delete loan request:", error);
-            toast.error("Failed to delete loan request");
+            console.error("Failed to delete loan details:", error);
+            toast.error("Failed to delete loan details");
         }
     };
 
@@ -105,50 +102,28 @@ export default function LoansPage() {
             render: (remainingPayable: number) =>
                 currency.format(remainingPayable),
         },
+    ];
+
+    const actions: Action<any>[] = [
         {
-            key: "status",
-            label: "Status",
-            render: (status: string) => (
-                <span
-                    className={`min-w-25 inline-flex justify-center py-2 rounded-full text-center text-xs font-medium ${
-                        StatusStyles[status] || "bg-green-100 text-green-600"
-                    }`}
-                >
-                    {status}
-                </span>
-            ),
+            label: "View",
+            type: "link" as const,
+            href: (row: any) => `/loans/view/${row.id}`,
+            variant: "primary",
         },
         {
-            key: "id",
-            label: "Action",
-            render: (id: string, loan: any) => (
-                <div className="flex gap-2">
-                    <Link
-                        href={`/loans/view/${loan.id}`}
-                        className="px-4 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
-                    >
-                        View
-                    </Link>
-
-                    {isAdmin && loan.status !== "CLOSED" && (
-                        <>
-                            <Link
-                                href={`/loans/edit/${loan.id}`}
-                                className="px-4 py-1 text-sm bg-amber-500 text-white rounded-full hover:bg-amber-600 transition"
-                            >
-                                Edit
-                            </Link>
-
-                            <button
-                                onClick={() => handleDelete(loan.id)}
-                                className="px-4 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
-                            >
-                                Delete
-                            </button>
-                        </>
-                    )}
-                </div>
-            ),
+            label: "Edit",
+            type: "link" as const,
+            href: (row: any) => `/loans/edit/${row.id}`,
+            variant: "secondary",
+            hidden: (row) => !isAdmin || row.status === "CLOSED",
+        },
+        {
+            label: "Delete",
+            type: "button" as const,
+            onClick: (row: any) => handleDelete(row.id),
+            variant: "danger",
+            hidden: (row) => !isAdmin || row.status === "CLOSED",
         },
     ];
 
@@ -182,6 +157,7 @@ export default function LoansPage() {
                 <ResponsiveDataView
                     columns={columns}
                     data={loans}
+                    actions={actions}
                     mobileGridClass="grid-cols-2"
                 />
             </div>
