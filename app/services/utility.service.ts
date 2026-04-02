@@ -25,3 +25,16 @@ export const monthFieldValue = (date: Date) => {
 };
 
 export const getStyle = (section: string, type: string) => DashboardStyle[section][type];
+
+export const getActionStyle = (variant: string) => {
+    switch (variant) {
+        case "primary":
+            return "bg-blue-600 text-white hover:bg-blue-700";
+        case "secondary":
+            return "bg-gray-100 text-gray-700 hover:bg-gray-200";
+        case "danger":
+            return "bg-red-100 text-red-600 hover:bg-red-200";
+        default:
+            return "bg-gray-100 text-gray-700";
+    }
+};

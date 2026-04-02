@@ -1,7 +1,5 @@
 "use client";
 import ResponsiveDataView from "@/app/components/ui/ResponsiveDataView";
-import LoanList from "../../components/loans/LoanList";
-import { getAllLoans } from "../../services/loan.service";
 import LinkBtn from "@/app/components/ui/LinkBtn";
 import Link from "next/link";
 import { StatusStyles } from "@/config/status.style";
