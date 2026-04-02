@@ -1,20 +1,24 @@
-"use client";
 
-import { getStyle } from "../services/utility.service";
+import { getDashboardStats } from "../services/dashboard.service";
+import { currency, getStyle } from "../services/utility.service";
 
-export default function StatCard({
+export default async function StatCard({
     title,
-    value,
+    requestType,
+    valueType,
     styleType,
     styleSection,
 }: {
     title: string;
-    value: number | string;
+    requestType: string;
+    valueType: "currency" | "number";
     styleType: string;
     styleSection: string;
 }) {
     const style = getStyle(styleType, styleSection);
 
+    const statValue: any = await getDashboardStats(requestType);
+       
     return (
         <div className="relative group">
             {/* Glow border */}
@@ -32,7 +36,7 @@ export default function StatCard({
                         </p>
 
                         <p className="text-3xl font-bold text-gray-900">
-                            {value}
+                            {valueType === "currency" ? currency.format(Number(statValue)) : statValue}
                         </p>
                     </div>
 
@@ -46,25 +50,5 @@ export default function StatCard({
                 </div>
             </div>
         </div>
-
-        // <div
-        //     className={`bg-white border-l-4 ${style.accent} rounded-xl shadow-sm p-5 hover:shadow-lg transition duration-300`}
-        // >
-        //     <div className="flex items-center justify-between">
-        //         <div>
-        //             <p className="text-sm text-gray-500 font-medium">{title}</p>
-
-        //             <p className="text-3xl font-bold text-gray-900 mt-1">
-        //                 {value}
-        //             </p>
-        //         </div>
-
-        //         <div
-        //             className={`flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${style.iconBg} text-white text-xl shadow`}
-        //         >
-        //             {style.icon}
-        //         </div>
-        //     </div>
-        // </div>
     );
 }

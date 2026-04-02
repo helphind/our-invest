@@ -58,22 +58,22 @@ export default function EmiCalculator() {
 
         {
             key: "principal",
-            label: "Principal From EMI",
+            label: "Principal Paid",
             render: (principal: number) => currency.format(principal),
         },
         {
             key: "interest",
-            label: "Interest From EMI",
+            label: "Interest Paid",
             render: (Interest: number) => currency.format(Interest),
         },
         {
             key: "emi",
-            label: "EMI",
+            label: "EMI Amount",
             render: (emi: number) => currency.format(emi),
         },
         {
             key: "balance",
-            label: "Remaining Principal",
+            label: "Outstanding Balance",
             render: (balance: number) => currency.format(balance),
         },
     ];

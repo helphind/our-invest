@@ -1,177 +1,162 @@
+import { Suspense } from "react";
 import StatCard from "../../components/StatCard";
-import {
-    getAmountsOnHold,
-    getAvailableAmountForLoan,
-    getTotalContributions,
-    getTotalInterests,
-    getTotalPendingContributions,
-    getTotalReturns,
-} from "../../services/contribution.service";
-import {
-    getActiveInstantLoansCount,
-    getActiveLoansCount,
-    getClosedInstantLoansCount,
-    getClosedLoansCount,
-    getHoldInstantLoansCount,
-    getHoldLoansCount,
-} from "../../services/loan.service";
-import {
-    getActiveMembersCount,
-    getMembersCount,
-} from "../../services/member.service";
-import { currency } from "../../services/utility.service";
+import StatCardSkeleton from "@/app/components/StatCardSkeleton";
 
-export const dynamic = "force-dynamic";
-
-export default async function DashboardPage() {
-    const totalContributions = await getTotalContributions();
-    const totalPendingContributions = await getTotalPendingContributions();
-    // const totalSkippedContributions = await getTotalSkippedContributions();
-
-    const amountOnHold = await getAmountsOnHold();
-    const totalInterest = await getTotalInterests();
-    const totalReturns = await getTotalReturns();
-    const availableAmountForLoans = await getAvailableAmountForLoan();
-
-    const activeLoans = await getActiveLoansCount();
-    const closedLoans = await getClosedLoansCount();
-    const holdLoans = await getHoldLoansCount();
-
-    const instantLoans = await getActiveInstantLoansCount();
-    const closedInstantLoans = await getClosedInstantLoansCount();
-    const holdInstantLoans = await getHoldInstantLoansCount();
-
-    const allMembers = await getMembersCount();
-    const activeMembers = await getActiveMembersCount();
-
+export default function DashboardPage() {
     return (
         <div className="pb-6">
             <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatCard
-                    title="Total Contributions"
-                    value={
-                        totalContributions
-                            ? currency.format(Number(totalContributions))
-                            : "-"
-                    }
-                    styleType="contribution"
-                    styleSection="paid"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Total Contributions"
+                        requestType="totalContributions"
+                        valueType="currency"
+                        styleType="contribution"
+                        styleSection="paid"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Total Pending Contributions"
-                    value={
-                        totalPendingContributions
-                            ? currency.format(Number(totalPendingContributions))
-                            : "-"
-                    }
-                    styleType="contribution"
-                    styleSection="pending"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Total Pending Contributions"
+                        requestType="totalPendingContributions"
+                        valueType="currency"
+                        styleType="contribution"
+                        styleSection="pending"
+                    />
+                </Suspense>
 
-                {/* 
-                <StatCard
-                    title="Total Waived / Skipped Contributions"
-                    value={totalSkippedContributions ? currency.format(Number(totalSkippedContributions)) : '-'}
-                    styleType="contribution"
-                    styleSection="skipped"
-                /> 
-                */}
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Amount OnHold"
+                        styleType="payments"
+                        requestType="amountOnHold"
+                        valueType="currency"
+                        styleSection="pending"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Amount OnHold"
-                    value={currency.format(amountOnHold)}
-                    styleType="payments"
-                    styleSection="pending"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Total Interest"
+                        requestType="totalInterest"
+                        valueType="currency"
+                        styleType="payments"
+                        styleSection="interest"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Total Interest"
-                    value={
-                        totalInterest
-                            ? currency.format(Number(totalInterest))
-                            : "-"
-                    }
-                    styleType="payments"
-                    styleSection="interest"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Total Return"
+                        requestType="totalReturns"
+                        valueType="currency"
+                        styleType="payments"
+                        styleSection="returned"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Total Return"
-                    value={currency.format(totalReturns)}
-                    styleType="payments"
-                    styleSection="returned"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Available Amount for Loans"
+                        requestType="availableAmountForLoans"
+                        valueType="currency"
+                        styleType="payments"
+                        styleSection="available"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Available Amount for Loans"
-                    value={currency.format(availableAmountForLoans)}
-                    styleType="payments"
-                    styleSection="available"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Active Loans"
+                        requestType="activeLoans"
+                        valueType="number"
+                        styleType="loanCount"
+                        styleSection="active"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Active Loans"
-                    value={activeLoans}
-                    styleType="loanCount"
-                    styleSection="active"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Closed Loans"
+                        requestType="closedLoans"
+                        valueType="number"
+                        styleType="loanCount"
+                        styleSection="closed"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Closed Loans"
-                    value={closedLoans}
-                    styleType="loanCount"
-                    styleSection="closed"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Loans on Hold"
+                        requestType="holdLoans"
+                        valueType="number"
+                        styleType="loanCount"
+                        styleSection="hold"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Loans on Hold"
-                    value={holdLoans}
-                    styleType="loanCount"
-                    styleSection="hold"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Active Instant Loans"
+                        requestType="instantLoans"
+                        valueType="number"
+                        styleType="loanCount"
+                        styleSection="active"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Active Instant Loans"
-                    value={instantLoans}
-                    styleType="loanCount"
-                    styleSection="active"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Closed Instant Loans"
+                        requestType="closedInstantLoans"
+                        valueType="number"
+                        styleType="loanCount"
+                        styleSection="closed"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Closed Instant Loans"
-                    value={closedInstantLoans}
-                    styleType="loanCount"
-                    styleSection="closed"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Instant Loans on Hold"
+                        requestType="holdInstantLoans"
+                        valueType="number"
+                        styleType="loanCount"
+                        styleSection="hold"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Instant Loans on Hold"
-                    value={holdInstantLoans}
-                    styleType="loanCount"
-                    styleSection="hold"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Active Members"
+                        requestType="activeMembers"
+                        valueType="number"
+                        styleType="members"
+                        styleSection="active"
+                    />
+                </Suspense>
 
-                <StatCard
-                    title="Active Members"
-                    value={activeMembers}
-                    styleType="members"
-                    styleSection="active"
-                />
-                <StatCard
-                    title="InActive Members"
-                    value={allMembers - activeMembers}
-                    styleType="members"
-                    styleSection="inactive"
-                />
-                <StatCard
-                    title="Total Members"
-                    value={allMembers}
-                    styleType="members"
-                    styleSection="total"
-                />
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="InActive Members"
+                        requestType="inactiveMembers"
+                        valueType="number"
+                        styleType="members"
+                        styleSection="inactive"
+                    />
+                </Suspense>
+
+                <Suspense fallback={<StatCardSkeleton />}>
+                    <StatCard
+                        title="Total Members"
+                        requestType="allMembers"
+                        valueType="number"
+                        styleType="members"
+                        styleSection="total"
+                    />
+                </Suspense>
             </div>
         </div>
     );

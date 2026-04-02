@@ -3,6 +3,37 @@ import { createEmiSchedule } from "@/app/services/emi.service";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+/**
+ * 
+ * @returns GET All loans
+ */
+export async function GET() {
+    const loans = await prisma.loan.findMany({
+        include: {
+            member: {
+                select: {
+                    name: true,
+                },
+            },
+        },
+        orderBy: {
+            startDate: "desc",
+        },
+    });
+
+    const formattedLoans = loans.map((loan) => ({
+        ...loan,
+        principal: Number(loan.principal),
+        remainingPrincipal: Number(loan.remainingPrincipal),
+        interestRate: Number(loan.interestRate),
+        totalPayable: Number(loan.totalPayable),
+        remainingPayable: Number(loan.remainingPayable),
+        emiAmount: Number(loan.emiAmount),
+    }));
+
+    return NextResponse.json(formattedLoans);
+}
+
 export async function POST(request: Request) {
     try {
         const loanRequestData = await request.json();

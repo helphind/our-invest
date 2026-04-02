@@ -31,11 +31,14 @@ export async function POST(req: Request) {
     }
 }
 
+/* GET all Active members */
 export async function GET() {
     const members = await prisma.member.findMany({
         where: { isActive: true },
+        orderBy: {
+            name: "asc",
+        },
     });
 
     return NextResponse.json(members);
 }
-

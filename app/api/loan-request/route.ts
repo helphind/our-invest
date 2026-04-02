@@ -67,6 +67,7 @@ export async function PUT(request: Request) {
     }
 }
 
+/* Method to Get All the loan requests */
 export async function GET() {
     const loanRequests = await prisma.loanRequest.findMany({
         include: {
@@ -85,3 +86,4 @@ export async function GET() {
 
     return NextResponse.json(formattedLoanRequests);
 }
+
