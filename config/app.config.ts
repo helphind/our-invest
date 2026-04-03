@@ -1,3 +1,3 @@
 export const AppConfig = {
-    appName: 'Circle Fund'
+    appName: 'OCET Circle Fund'
 }

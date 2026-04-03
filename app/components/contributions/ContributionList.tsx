@@ -30,9 +30,7 @@ export default function ContributionList({
 }: Props) {
     const [loader, setLoader] = useState(false);
     const [filterStatus, setFilterStatus] = useState("ALL");
-    const [filterMonth, setFilterMonth] = useState(
-        new Date().toISOString().slice(0, 7),
-    );
+    const [filterMonth, setFilterMonth] = useState("");
     const [filteredContributions, setFilteredContributions] = useState<any[]>(
         [],
     );
@@ -244,13 +242,25 @@ export default function ContributionList({
                                 </LinkBtn>
                             )}
 
-                            <LinkBtn
-                                href="/contributions/all"
-                                btnType="green"
-                                className="w-full sm:w-auto"
-                            >
-                                Show All
-                            </LinkBtn>
+                            {listType === "MONTH" && (
+                                <LinkBtn
+                                    href="/contributions/all"
+                                    btnType="gray"
+                                    className="w-full sm:w-auto"
+                                >
+                                    Show All
+                                </LinkBtn>
+                            )}
+
+                            {listType === "ALL" && (
+                                <LinkBtn
+                                    href="/contributions"
+                                    btnType="green"
+                                    className="w-full sm:w-auto"
+                                >
+                                    Show Current Month
+                                </LinkBtn>
+                            )}
 
                             <LinkBtn
                                 href="/contributions/add"

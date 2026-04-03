@@ -53,7 +53,7 @@ export default function EmiCalculator() {
     const columns = [
         {
             key: "month",
-            label: "Month",
+            label: "Instalment No",
         },
 
         {

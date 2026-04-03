@@ -1,23 +1,24 @@
+"use client";
+
+import MemberFormSkeleton from "@/app/components/members/MeberFormSkeleton";
 import MemberForm from "@/app/components/members/MemberForm";
-import { Member } from "@/app/interface/Member.type";
-import { prisma } from "@/lib/prisma";
+import { useParams } from "next/navigation";
+import { Suspense } from "react";
 
-export const dynamic = "force-dynamic";
+export default function MemberEditPage() {
+    const params = useParams();
 
-export default async function MemberEditPage({ params }: any) {
-    const param = await params;
-
-    const member: Member | null = await prisma.member.findUnique({
-        where: { id: param.id }
-    });
+    const memberId: string = String(params.id);
 
     return (
         <div className="max-w-xl mx-auto mt-12 bg-white shadow-md rounded-xl border p-6">
-            <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-                Edit Member
-            </h1>
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                Update Member
+            </h2>
 
-            <MemberForm member={member} />
+            <Suspense fallback={<MemberFormSkeleton />}>
+                <MemberForm memberId={memberId} />
+            </Suspense>
         </div>
     );
 }

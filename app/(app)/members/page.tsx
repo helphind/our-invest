@@ -6,15 +6,14 @@ import LinkBtn from "@/app/components/ui/LinkBtn";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { Role } from "@/app/generated/prisma/enums";
-import { useRouter } from "next/navigation";
 import Loader from "@/app/components/ui/Loader";
 import { Action } from "@/app/interface/DataView.interface";
 import AddIcon from "@/app/components/ui/icons/add";
+import { fa } from "zod/v4/locales";
 
 export default function MembersPage() {
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
 
     const { data: session } = useSession();
 
@@ -46,9 +45,12 @@ export default function MembersPage() {
         if (!confirmed) return;
 
         try {
+            setLoading(true);
             const response = await fetch(`/api/members/${id}`, {
                 method: "DELETE",
             });
+
+            setLoading(false);
 
             if (!response.ok) {
                 const data = await response.json();
@@ -156,6 +158,7 @@ export default function MembersPage() {
                     data={members}
                     actions={actions}
                     mobileGridClass="grid-cols-1"
+                    showDesktopStatus={false}
                 />
             </div>
         </div>
