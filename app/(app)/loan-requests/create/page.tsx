@@ -1,6 +1,9 @@
 "use client";
 
+import LoanApplicationForm from "@/app/components/loans/LoanApplicationForm";
 import Loader from "@/app/components/ui/Loader";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -49,57 +52,22 @@ export default function LoansPage() {
     }, []);
 
     return (
-        <div>
-            <h2 className="text-2xl font-bold mb-6">Loan Request</h2>
-            {loading && <Loader />}
-            <form onSubmit={loanRequest}>
-                <div className="bg-white p-6 rounded-xl shadow max-w-md">
-                    <div className="mb-4">
-                        <label className="block mb-2">Member ID</label>
-                        <select
-                            className="w-full border rounded-lg p-2"
-                            value={memberId}
-                            onChange={(e) => setMemberId(e.target.value)}
-                        >
-                            <option value="">Select a member</option>
-                            {members.map((member: any) => (
-                                <option key={member.id} value={member.id}>
-                                    {member.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+        <div className="max-w-2xl mx-auto mt-8 space-y-6">
+            {/* Header */}
+            <div className="flex items-center gap-3">
+                <Link
+                    href="/loans"
+                    className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-gray-100 hover:bg-gray-200 transition"
+                >
+                    <ArrowLeft size={16} />
+                </Link>
 
-                    <div className="mb-4">
-                        <label className="block mb-2">Loan Amount</label>
-                        <input
-                            type="number"
-                            value={amount}
-                            onChange={(e) => setAmount(Number(e.target.value))}
-                            className="w-full border rounded-lg p-2"
-                        />
-                    </div>
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                    Loan Application
+                </h2>
+            </div>
 
-                    <div className="mb-4">
-                        <label className="block mb-2">Loan Type</label>
-                        <select
-                            className="w-full border rounded-lg p-2"
-                            value={loanType}
-                            onChange={(e) => setLoanType(e.target.value)}
-                        >
-                            <option value="NORMAL">Normal</option>
-                            <option value="INSTANT">Instant Loan</option>
-                        </select>
-                    </div>
-
-                    <button
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-                        disabled={loading}
-                    >
-                        {loading ? "Submitting..." : "Submit Request"}
-                    </button>
-                </div>
-            </form>
+            <LoanApplicationForm loanApplicationId={null} />
         </div>
     );
 }

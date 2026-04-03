@@ -10,6 +10,8 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
     columns = [],
     actions = [],
     mobileGridClass,
+    showAvatar = true,
+    showFirstLabel = false,
 }: ResponsiveDataViewProps<T>) {
     return (
         <div className="w-full">
@@ -68,24 +70,26 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
                         <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-3">
                                 {/* Avatar / Initial */}
-                                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
-                                
-                                    {columns[0]?.render
-                                        ? String(
-                                              columns[0].render(
-                                                  row[columns[0].key],
-                                                  row,
-                                              ),
-                                          )
-                                              .charAt(0)
-                                              .toUpperCase()
-                                        : String(row[columns[0].key])
-                                              .charAt(0)
-                                              .toUpperCase()}
-                                </div>
+                                {showAvatar && (
+                                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
+                                        {columns[0]?.render
+                                            ? String(
+                                                  columns[0].render(
+                                                      row[columns[0].key],
+                                                      row,
+                                                  ),
+                                              )
+                                                  .charAt(0)
+                                                  .toUpperCase()
+                                            : String(row[columns[0].key])
+                                                  .charAt(0)
+                                                  .toUpperCase()}
+                                    </div>
+                                )}
 
                                 <div>
                                     <h3 className="text-sm font-semibold text-gray-900 leading-tight">
+                                        {showFirstLabel && `${columns[0]?.label}: `}{" "}
                                         {columns[0]?.render
                                             ? columns[0].render(
                                                   row[columns[0].key],

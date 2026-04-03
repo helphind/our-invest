@@ -16,7 +16,7 @@ export default function Sidebar() {
         { name: "Members", href: "/members", icon: "👥" },
         { name: "Contribution", href: "/contributions", icon: "💸" },
         { name: "Loans", href: "/loans", icon: "💰" },
-        { name: "Loan Requests", href: "/loan-requests", icon: "📄" },
+        { name: "Loan Applications", href: "/loan-requests", icon: "📄" },
         { name: "EMI Calculator", href: "/emi-calculator", icon: "🧮" },
     ];
 

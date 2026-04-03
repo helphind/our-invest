@@ -1,11 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 export default function GenerateContribution() {
     const [month, setMonth] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const router = useRouter();
 
     const handleGenerate = async () => {
         if (!month) {
@@ -28,7 +31,8 @@ export default function GenerateContribution() {
             });
 
             const data = await res.json();
-            toast.success(`✅ Created: ${data.created}`);
+            toast.success(`✅ Created Count: ${data.created}`);
+            router.push("/contributions");
         } catch (err) {
             toast.error("❌ Failed to generate");
         } finally {

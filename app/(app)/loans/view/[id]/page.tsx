@@ -1,8 +1,14 @@
 "use client";
 
+import DetailItem from "@/app/components/ui/DetailedItem";
 import Loader from "@/app/components/ui/Loader";
 import ResponsiveDataView from "@/app/components/ui/ResponsiveDataView";
-import { currency, formatDate, formatMonth } from "@/app/services/utility.service";
+import { Action } from "@/app/interface/DataView.interface";
+import {
+    currency,
+    formatDate,
+    formatMonth,
+} from "@/app/services/utility.service";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,7 +17,7 @@ import toast from "react-hot-toast";
 export default function ViewLoanPage({ params }: { params: { id: string } }) {
     const [loan, setLoan] = useState<any>(null);
     const [emiSchedule, setEmiSchedule] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const router = useRouter();
 
@@ -62,7 +68,7 @@ export default function ViewLoanPage({ params }: { params: { id: string } }) {
     const columns = [
         {
             key: "installmentNo",
-            label: "S.No",
+            label: "Installment No",
             render: (installmentNo: number) => installmentNo,
         },
         {
@@ -91,152 +97,143 @@ export default function ViewLoanPage({ params }: { params: { id: string } }) {
             render: (paidDate: Date) =>
                 paidDate ? formatDate(paidDate) : "--",
         },
+    ];
+
+    const actions: Action<any>[] = [
         {
-            key: "status",
-            label: "Status",
-            render: (status: string) =>
-                status === "PAID" ? (
-                    <span className="inline-flex min-w-25 justify-center bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                        Paid
-                    </span>
-                ) : (
-                    <div className="inline-flex min-w-25 justify-center bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs cursor-pointer">
-                        Pending
-                    </div>
-                ),
-        },
-        {
-            key: "id",
-            label: "Action",
-            render: (id: string, row: any) =>
-                row.status !== "PAID" && (
-                    <div
-                        className="inline-flex min-w-25 justify-center bg-green-600 text-white px-2 py-1 rounded-full text-xs cursor-pointer"
-                        onClick={() => handleEmi(row)}
-                    >
-                        Mark as Paid
-                    </div>
-                ),
+            label: "Mark as Paid",
+            type: "button" as const,
+            onClick: (row: any) => handleEmi(row),
+            variant: "primaryGreen",
+            hidden: (row) => row.status === "PAID",
         },
     ];
 
     return (
         <div>
-            <div>
-                <Link
-                    href="/loans"
-                    className="cursor-pointer font-bold ml-auto pointer"
-                >
-                    Back
-                </Link>
-            </div>
-            <div className="max-w-xl mx-auto bg-white shadow-lg rounded-2xl p-6 mb-3">
-                <h2 className="text-xl font-semibold mb-6">Loan Details</h2>
-                {loading && <Loader />}
-
+            {loading && <Loader />}
+            {!loading && (
+                <div className="flex justify-end mb-3">
+                    <Link
+                        href="/loans"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                    >
+                        ← Back to Loans
+                    </Link>
+                </div>
+            )}
+            <div className="max-w-xl mx-auto bg-white shadow-lg rounded-2xl mb-5">
                 {loan && (
-                    <div className="space-y-4">
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="text-gray-500">Member</span>
-                            <span className="font-medium">
-                                {loan.member.name}
-                            </span>
-                        </div>
+                    <div className="bg-white shadow-xl rounded-2xl border border-gray-100 overflow-hidden">
+                        {/* Header */}
+                        <div className="px-6 py-5 border-b bg-gray-50 flex items-center justify-between">
+                            <div>
+                                <h2 className="text-xl font-semibold text-gray-800">
+                                    Loan Details
+                                </h2>
+                                <p className="text-sm text-gray-500">
+                                    Overview of loan information
+                                </p>
+                            </div>
 
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="text-gray-500">Loan Type</span>
-                            <span className="font-medium">{loan.loanType}</span>
-                        </div>
-
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="text-gray-500">Status</span>
-                            <span className="text-green-600">
+                            {/* Status Badge */}
+                            <span
+                                className={`px-3 py-1 text-xs font-medium rounded-full ${
+                                    loan.status === "ACTIVE"
+                                        ? "bg-green-100 text-green-700"
+                                        : "bg-gray-100 text-gray-600"
+                                }`}
+                            >
                                 {loan.status}
                             </span>
                         </div>
 
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="text-gray-500">
-                                Loan Principal
-                            </span>
-                            <span className="font-medium">
-                                {currency.format(loan.principal)}
-                            </span>
-                        </div>
+                        {/* Content */}
+                        <div className="p-6 space-y-6">
+                            {/* Basic Info */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <DetailItem
+                                    label="Member"
+                                    value={loan.member.name}
+                                />
+                                <DetailItem
+                                    label="Loan Type"
+                                    value={loan.loanType}
+                                />
+                                <DetailItem
+                                    label="Tenure"
+                                    value={`${loan.durationMonths} months`}
+                                />
+                                <DetailItem
+                                    label="Start Date"
+                                    value={formatMonth(loan.startDate)}
+                                />
+                                <DetailItem
+                                    label="Interest Rate"
+                                    value={`${loan.interestRate}%`}
+                                />
+                            </div>
 
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="text-gray-500">
-                                Tenure(In Months)
-                            </span>
-                            <span className="font-semibold text-blue-600">
-                                {loan.durationMonths}
-                            </span>
-                        </div>
+                            {/* Divider */}
+                            <div className="border-t"></div>
 
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="text-gray-500">Start Date</span>
-                            <span className="font-semibold text-blue-600">
-                                {formatMonth(loan.startDate)}
-                            </span>
-                        </div>
+                            {/* Financial Summary */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <DetailItem
+                                    label="Principal"
+                                    value={currency.format(loan.principal)}
+                                    highlight="primary"
+                                />
 
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="text-gray-500">Interest Rate</span>
-                            <span className="font-medium">
-                                {loan.interestRate}%
-                            </span>
-                        </div>
+                                <DetailItem
+                                    label="EMI"
+                                    value={currency.format(loan.emiAmount)}
+                                    highlight="info"
+                                />
 
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="text-gray-500">EMI</span>
-                            <span className="font-semibold text-blue-600">
-                                {currency.format(loan.emiAmount)}
-                            </span>
-                        </div>
+                                <DetailItem
+                                    label="Total Interest"
+                                    value={currency.format(
+                                        loan.totalPayable - loan.principal,
+                                    )}
+                                    highlight="danger"
+                                />
 
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="text-gray-500">
-                                Total Interest
-                            </span>
-                            <span className="text-red-500">
-                                {currency.format(
-                                    loan.totalPayable - loan.principal,
-                                )}
-                            </span>
-                        </div>
+                                <DetailItem
+                                    label="Total Payable"
+                                    value={currency.format(loan.totalPayable)}
+                                    highlight="success"
+                                />
+                            </div>
 
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="font-semibold text-gray-600">
-                                Total Payable
-                            </span>
-                            <span className="font-bold text-green-600">
-                                {currency.format(loan.totalPayable)}
-                            </span>
-                        </div>
+                            {/* Divider */}
+                            <div className="border-t"></div>
 
-                        <div className="flex justify-between border-b pb-2">
-                            <span className="font-semibold text-gray-600">
-                                Remaining Principal
-                            </span>
-                            <span className="font-bold text-green-600">
-                                {currency.format(loan.remainingPrincipal)}
-                            </span>
-                        </div>
+                            {/* Remaining Section */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <DetailItem
+                                    label="Remaining Principal"
+                                    value={currency.format(
+                                        loan.remainingPrincipal,
+                                    )}
+                                    highlight="success"
+                                />
 
-                        <div className="flex justify-between pb-2">
-                            <span className="font-semibold text-gray-600">
-                                Remaining Payable
-                            </span>
-                            <span className="font-bold text-green-600">
-                                {currency.format(loan.remainingPayable)}
-                            </span>
+                                <DetailItem
+                                    label="Remaining Payable"
+                                    value={currency.format(
+                                        loan.remainingPayable,
+                                    )}
+                                    highlight="success"
+                                />
+                            </div>
                         </div>
                     </div>
                 )}
             </div>
 
             {emiSchedule && emiSchedule.length > 0 && (
-                <div className="bg-white shadow rounded-xl p-6">
+                <div className="bg-white shadow rounded-xl pt-6">
                     <h2 className="text-lg font-semibold mb-4">
                         Repayment Details
                     </h2>
@@ -245,61 +242,23 @@ export default function ViewLoanPage({ params }: { params: { id: string } }) {
                         <ResponsiveDataView
                             columns={columns}
                             data={emiSchedule}
+                            actions={actions}
+                            showAvatar={false}
+                            showFirstLabel={true}
                             mobileGridClass="grid-cols-2"
                         />
-                        {/* 
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b text-left">
-                                    <th className="py-2">S.No</th>
-                                    <th>Due Month</th>
-                                    <th>EMI</th>
-                                    <th>Principal</th>
-                                    <th>Interest</th>
-                                    <th>Paid Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {emiSchedule.map((row: any) => (
-                                    <tr key={row.id} className="border-b">
-                                        <td>{row.installmentNo}</td>
-                                        <td className="py-2">
-                                            {formatMonth(row.dueDate)}
-                                        </td>
-                                        <td>{currency.format(row.amount)}</td>
-                                        <td>
-                                            {currency.format(row.principal)}
-                                        </td>
-                                        <td>{currency.format(row.interest)}</td>
-                                        <td>
-                                            {row.paidDate
-                                                ? formatDate(row.paidDate)
-                                                : "--"}
-                                        </td>
-                                        <td className="text-center">
-                                            {row.status === "PAID" ? (
-                                                <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                                                    Paid
-                                                </div>
-                                            ) : (
-                                                <div
-                                                    className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs cursor-pointer"
-                                                    onClick={() =>
-                                                        handleEmi(row)
-                                                    }
-                                                >
-                                                    Pending
-                                                </div>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        */}
                     </div>
+                </div>
+            )}
+
+            {!loading && (
+                <div className="flex justify-end mt-3">
+                    <Link
+                        href="/loans"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                    >
+                        ← Back to Loans
+                    </Link>
                 </div>
             )}
         </div>

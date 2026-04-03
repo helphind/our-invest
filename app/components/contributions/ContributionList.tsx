@@ -244,13 +244,25 @@ export default function ContributionList({
                                 </LinkBtn>
                             )}
 
-                            <LinkBtn
-                                href="/contributions/all"
-                                btnType="green"
-                                className="w-full sm:w-auto"
-                            >
-                                Show All
-                            </LinkBtn>
+                            {listType === "MONTH" && (
+                                <LinkBtn
+                                    href="/contributions/all"
+                                    btnType="gray"
+                                    className="w-full sm:w-auto"
+                                >
+                                    Show All
+                                </LinkBtn>
+                            )}
+
+                            {listType === "ALL" && (
+                                <LinkBtn
+                                    href="/contributions"
+                                    btnType="green"
+                                    className="w-full sm:w-auto"
+                                >
+                                    Show Current Month
+                                </LinkBtn>
+                            )}
 
                             <LinkBtn
                                 href="/contributions/add"

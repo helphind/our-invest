@@ -139,10 +139,10 @@ export default function LoanRequestPage() {
                 {/* Left Section */}
                 <div>
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-                        Loan Requests
+                        Loan Applications
                     </h2>
                     <p className="text-sm text-gray-500 mt-1">
-                        Manage and track loan requests
+                        Manage and track loan applications
                     </p>
                 </div>
 
@@ -152,7 +152,7 @@ export default function LoanRequestPage() {
                     className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-blue-600 text-white text-sm font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all"
                 >
                     <span className="text-lg">＋</span>
-                    New Loan Request
+                    New Loan Application
                 </LinkBtn>
             </div>
 
