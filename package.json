@@ -9,7 +9,8 @@
     "lint": "eslint",
     "seed:members": "pnpm tsx prisma/seed.members.ts",
     "seed:admin": "pnpm tsx prisma/seed.admin.ts",
-    "seed:users": "pnpm tsx prisma/seed.users.ts"
+    "seed:users": "pnpm tsx prisma/seed.users.ts",
+    "seed:fundConfig": "pnpm tsx prisma/seed.fundConfig.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
