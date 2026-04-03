@@ -30,9 +30,7 @@ export default function ContributionList({
 }: Props) {
     const [loader, setLoader] = useState(false);
     const [filterStatus, setFilterStatus] = useState("ALL");
-    const [filterMonth, setFilterMonth] = useState(
-        new Date().toISOString().slice(0, 7),
-    );
+    const [filterMonth, setFilterMonth] = useState("");
     const [filteredContributions, setFilteredContributions] = useState<any[]>(
         [],
     );

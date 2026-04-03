@@ -12,6 +12,7 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
     mobileGridClass,
     showAvatar = true,
     showFirstLabel = false,
+    showDesktopStatus = true,
 }: ResponsiveDataViewProps<T>) {
     return (
         <div className="w-full">
@@ -28,6 +29,17 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
                                     {col.label}
                                 </th>
                             ))}
+
+                            {showDesktopStatus && (
+                                <th className="p-3 font-semibold">Status</th>
+                            )}
+
+                            {/* ✅ Add Actions column */}
+                            {actions?.length > 0 && (
+                                <th className="p-3 font-semibold text-right">
+                                    Actions
+                                </th>
+                            )}
                         </tr>
                     </thead>
 
@@ -47,6 +59,80 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
                                             : row[col.key]}
                                     </td>
                                 ))}
+
+                                {showDesktopStatus && (
+                                    <td className="p-3">
+                                        {row.status && (
+                                            <span
+                                                className={`
+              text-xs font-medium px-2.5 py-1 rounded-full
+              ${StatusStyles[row.status] || "bg-gray-100 text-gray-600"}
+            `}
+                                            >
+                                                {row.status}
+                                            </span>
+                                        )}
+                                    </td>
+                                )}
+
+                                {/* ✅ Actions */}
+                                {actions?.length > 0 && (
+                                    <td className="p-3 text-right">
+                                        <div className="flex justify-end gap-2">
+                                            {actions.map((action, idx) => {
+                                                if (action.hidden?.(row))
+                                                    return null;
+
+                                                const baseClass = `
+                text-sm px-3 py-1 rounded-lg font-medium
+                transition flex items-center gap-1
+                ${getActionStyle(action.variant)}
+              `;
+
+                                                if (action.type === "link") {
+                                                    const href =
+                                                        typeof action.href ===
+                                                        "function"
+                                                            ? action.href(row)
+                                                            : action.href;
+
+                                                    if (!href) return null;
+
+                                                    return (
+                                                        <Link
+                                                            key={idx}
+                                                            href={href}
+                                                            className={
+                                                                baseClass
+                                                            }
+                                                        >
+                                                            {action.icon}
+                                                            {action.label}
+                                                        </Link>
+                                                    );
+                                                }
+
+                                                return (
+                                                    <button
+                                                        key={idx}
+                                                        onClick={() =>
+                                                            action.onClick?.(
+                                                                row,
+                                                            )
+                                                        }
+                                                        disabled={action.disabled?.(
+                                                            row,
+                                                        )}
+                                                        className={`${baseClass} disabled:opacity-50`}
+                                                    >
+                                                        {action.icon}
+                                                        {action.label}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </td>
+                                )}
                             </tr>
                         ))}
                     </tbody>
@@ -89,7 +175,8 @@ export default function ResponsiveDataView<T extends Record<string, any>>({
 
                                 <div>
                                     <h3 className="text-sm font-semibold text-gray-900 leading-tight">
-                                        {showFirstLabel && `${columns[0]?.label}: `}{" "}
+                                        {showFirstLabel &&
+                                            `${columns[0]?.label}: `}{" "}
                                         {columns[0]?.render
                                             ? columns[0].render(
                                                   row[columns[0].key],

@@ -158,6 +158,7 @@ export default function MembersPage() {
                     data={members}
                     actions={actions}
                     mobileGridClass="grid-cols-1"
+                    showDesktopStatus={false}
                 />
             </div>
         </div>

@@ -30,4 +30,5 @@ export interface ResponsiveDataViewProps<T> {
     mobileGridClass?: string; // e.g. "grid-cols-2", "grid-cols-3"
     showAvatar?: boolean;
     showFirstLabel?: boolean;
+    showDesktopStatus?: boolean;
 }
