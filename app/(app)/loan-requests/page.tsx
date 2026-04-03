@@ -121,7 +121,7 @@ export default function LoanRequestPage() {
             label: "Approvals",
             type: "link" as const,
             href: (row: any) => `/loan-requests/approvals/${row.id}`,
-            variant: "secondary",
+            variant: "primaryGreen",
             hidden: (row) => row.status !== "PENDING",
         },
         {

@@ -1,5 +1,8 @@
 "use server";
 
+import { ActionButtons } from "@/app/components/loans/Approval/ActionButtons";
+import { getStatus } from "@/app/components/loans/Approval/ApprovalStatus";
+import { StatusBadge } from "@/app/components/loans/Approval/StatusBadge";
 import { getActiveMembersCount } from "@/app/services/member.service";
 import { currency } from "@/app/services/utility.service";
 import { prisma } from "@/lib/prisma";
@@ -140,7 +143,7 @@ export default async function LoanApprovalsPage({
 
             {/* Approval Table Section Start */}
 
-            <div className="w-full mt-6">
+            <div className="w-full pt-4">
                 {/* Section Header */}
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-semibold text-gray-800">
@@ -149,7 +152,7 @@ export default async function LoanApprovalsPage({
                 </div>
 
                 {/* ✅ Desktop Table */}
-                <div className="hidden md:block overflow-hidden rounded-2xl border bg-white shadow-sm">
+                <div className="hidden md:block rounded-2xl border bg-white shadow-sm overflow-hidden">
                     <table className="w-full text-sm">
                         <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
                             <tr>
@@ -160,196 +163,81 @@ export default async function LoanApprovalsPage({
                         </thead>
 
                         <tbody className="divide-y">
-                            {members.map((member) => (
-                                <tr
-                                    key={member.id}
-                                    className="hover:bg-gray-50"
-                                >
-                                    <td className="px-6 py-4">{member.name}</td>
+                            {members.map((member) => {
+                                const status = getStatus(member);
 
-                                    <td className="px-6 py-4 text-xs rounded-full">
-                                        <span
-                                            className={`px-2 py-1 rounded-full text-sm ${
-                                                member.approvals?.[0]?.approved
-                                                    ? "bg-green-100 text-green-800"
-                                                    : member.approvals?.[0]
-                                                            ?.approved === false
-                                                      ? "bg-red-100 text-red-800"
-                                                      : "bg-gray-100 text-gray-700"
-                                            }`}
-                                        >
-                                            {member.approvals?.[0]?.approved
-                                                ? "Approved"
-                                                : member.approvals?.[0]
-                                                        ?.approved === false
-                                                  ? "Rejected"
-                                                  : "Pending"}
-                                        </span>
-                                    </td>
+                                return (
+                                    <tr
+                                        key={member.id}
+                                        className="hover:bg-gray-50 transition"
+                                    >
+                                        <td className="px-6 py-4">
+                                            <div className="flex flex-col">
+                                                <span className="font-medium text-gray-800">
+                                                    {member.name}
+                                                </span>
+                                                <span className="text-xs text-gray-500">
+                                                    {member.email}
+                                                </span>
+                                            </div>
+                                        </td>
 
-                                    <td className="px-6 py-4 flex justify-end gap-2">
-                                        {member.approvals.length === 0 && (
-                                            <>
-                                                <form action={approveReject}>
-                                                    <input
-                                                        type="hidden"
-                                                        name="loanRequestId"
-                                                        value={loanRequestId}
-                                                    />
-                                                    <input
-                                                        type="hidden"
-                                                        name="memberId"
-                                                        value={member.id}
-                                                    />
-                                                    <input
-                                                        type="hidden"
-                                                        name="actionType"
-                                                        value="approve"
-                                                    />
+                                        <td className="px-6 py-4">
+                                            <StatusBadge status={status} />
+                                        </td>
 
-                                                    <button
-                                                        type="submit"
-                                                        className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700"
-                                                    >
-                                                        Approve
-                                                    </button>
-                                                </form>
-
-                                                <form action={approveReject}>
-                                                    <input
-                                                        type="hidden"
-                                                        name="loanRequestId"
-                                                        value={loanRequestId}
-                                                    />
-                                                    <input
-                                                        type="hidden"
-                                                        name="memberId"
-                                                        value={member.id}
-                                                    />
-                                                    <input
-                                                        type="hidden"
-                                                        name="actionType"
-                                                        value="reject"
-                                                    />
-
-                                                    <button
-                                                        type="submit"
-                                                        className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-                                                    >
-                                                        Reject
-                                                    </button>
-                                                </form>
-                                            </>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
+                                        <td className="px-6 py-4 text-right">
+                                            <ActionButtons
+                                                member={member}
+                                                loanRequestId={loanRequestId}
+                                                approveReject={approveReject}
+                                            />
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
 
                 {/* ✅ Mobile Cards */}
                 <div className="md:hidden space-y-4">
-                    {members.map((member) => (
-                        <div
-                            key={member.id}
-                            className="p-4 rounded-2xl border bg-white shadow-sm"
-                        >
-                            {/* Top Row */}
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="font-semibold text-gray-800">
-                                        {member.name}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                        {member.email}
-                                    </p>
+                    {members.map((member) => {
+                        const status = getStatus(member);
+
+                        return (
+                            <div
+                                key={member.id}
+                                className="p-4 rounded-2xl border bg-white shadow-sm space-y-3"
+                            >
+                                {/* Top */}
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="font-medium text-gray-800">
+                                            {member.name}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            {member.email}
+                                        </p>
+                                    </div>
+
+                                    <StatusBadge status={status} />
                                 </div>
 
-                                <span
-                                    className={`px-3 py-1 rounded-full text-sm ${
-                                        member.approvals?.[0]?.approved
-                                            ? "bg-green-100 text-green-800"
-                                            : member.approvals?.[0]
-                                                    ?.approved === false
-                                              ? "bg-red-100 text-red-800"
-                                              : "bg-gray-100 text-gray-700"
-                                    }`}
-                                >
-                                    {member.approvals?.[0]?.approved
-                                        ? "Approved"
-                                        : member.approvals?.[0]?.approved ===
-                                            false
-                                          ? "Rejected"
-                                          : "Pending"}
-                                </span>
+                                {/* Divider */}
+                                <div className="border-t"></div>
+
+                                {/* Actions */}
+                                <div className="flex justify-end">
+                                    <ActionButtons
+                                        member={member}
+                                        loanRequestId={loanRequestId}
+                                        approveReject={approveReject}
+                                    />
+                                </div>
                             </div>
-
-                            {/* Divider */}
-                            <div className="my-3 border-t"></div>
-
-                            {/* Actions */}
-                            {member.approvals.length === 0 && (
-                                <div className="flex justify-end gap-2">
-                                    <form
-                                        className="inline-flex"
-                                        action={approveReject}
-                                    >
-                                        <input
-                                            type="hidden"
-                                            name="loanRequestId"
-                                            value={loanRequestId}
-                                        />
-                                        <input
-                                            type="hidden"
-                                            name="memberId"
-                                            value={member.id}
-                                        />
-                                        <input
-                                            type="hidden"
-                                            name="actionType"
-                                            value="approve"
-                                        />
-
-                                        <button
-                                            type="submit"
-                                            className=" py-2 px-3 text-sm bg-green-600 text-white rounded hover:bg-green-700"
-                                        >
-                                            Approve
-                                        </button>
-                                    </form>
-
-                                    <form
-                                        className="inline-flex"
-                                        action={approveReject}
-                                    >
-                                        <input
-                                            type="hidden"
-                                            name="loanRequestId"
-                                            value={loanRequestId}
-                                        />
-                                        <input
-                                            type="hidden"
-                                            name="memberId"
-                                            value={member.id}
-                                        />
-                                        <input
-                                            type="hidden"
-                                            name="actionType"
-                                            value="reject"
-                                        />
-
-                                        <button
-                                            type="submit"
-                                            className="py-2 px-3 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-                                        >
-                                            Reject
-                                        </button>
-                                    </form>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>

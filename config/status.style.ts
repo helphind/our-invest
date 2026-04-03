@@ -6,4 +6,5 @@ export const StatusStyles: Record<string, string> = {
     ACTIVE: "bg-green-200 text-green-800",
     HOLD: "bg-red-200 text-red-800",
     CLOSED: "bg-gray-200 text-gray-700",
+    APPROVED: "bg-green-300 text-green-800",
 };
