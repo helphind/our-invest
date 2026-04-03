@@ -1,5 +1,5 @@
-export const StatusBadge = ({ status  }) => {
-    const map = {
+export const StatusBadge = ({ status }: { status: string }) => {
+    const map: any = {
         APPROVED: "bg-green-100 text-green-700",
         REJECTED: "bg-red-100 text-red-700",
         PENDING: "bg-gray-100 text-gray-600",
