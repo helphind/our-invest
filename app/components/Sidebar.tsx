@@ -4,6 +4,7 @@ import { AppConfig } from "@/config/app.config";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 export default function Sidebar() {
     const [open, setOpen] = useState(false);
@@ -45,9 +46,15 @@ export default function Sidebar() {
             >
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-2xl font-bold text-blue-600">
-                        {appName}
-                    </h2>
+                    <Link href="/"
+                     className="text-2xl font-bold text-blue-600">
+                        <Image
+                            src="/images/logo.png"
+                            width={180}
+                            height={70}
+                            alt={appName}
+                        />
+                    </Link>
 
                     {/* Close button (mobile) */}
                     <button
@@ -74,6 +81,6 @@ export default function Sidebar() {
                     ))}
                 </nav>
             </aside>
-        </div>      
+        </div>
     );
 }
