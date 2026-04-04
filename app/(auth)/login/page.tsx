@@ -5,6 +5,7 @@ import Loader from "@/app/components/ui/Loader";
 import { AppConfig } from "@/config/app.config";
 import { loginSchema } from "@/lib/validation/login.schema";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -44,7 +45,6 @@ export default function LoginPage() {
                 maxAge: 60 * 60 * 2, // 2 hours
             },
         });
-
     };
 
     return (
@@ -56,8 +56,14 @@ export default function LoginPage() {
             >
                 {/* Title */}
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-800">
-                        {appName}
+                    <h1 className="flex justify-center text-2xl font-bold text-gray-800 mb-6">
+                        
+                        <Image
+                            src="/images/logo.png"
+                            width={200}
+                            height={150}
+                            alt={appName}
+                        />
                     </h1>
                     <p className="text-sm text-gray-500 mt-1">
                         Login to your account
