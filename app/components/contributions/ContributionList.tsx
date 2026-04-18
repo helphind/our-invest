@@ -14,6 +14,7 @@ import { Role } from "@/app/generated/prisma/enums";
 import ResponsiveDataView from "../ui/ResponsiveDataView";
 import { Action } from "@/app/interface/DataView.interface";
 import AddIcon from "../ui/icons/add";
+import { sendContributionMessage } from "@/app/services/message.service";
 
 type Props = {
     contributions: any[];

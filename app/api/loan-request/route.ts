@@ -77,6 +77,12 @@ export async function GET() {
                 },
             },
         },
+        where: {
+            isDeleted: false,
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
     });
 
     const formattedLoanRequests = loanRequests.map((loanRequest) => ({
@@ -86,4 +92,3 @@ export async function GET() {
 
     return NextResponse.json(formattedLoanRequests);
 }
-

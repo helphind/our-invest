@@ -69,8 +69,10 @@ export async function DELETE(
     try {
         const param = await params;
         const loanRequestId = await param.id;
-        await prisma.loanRequest.delete({
+
+        await prisma.loanRequest.update({
             where: { id: loanRequestId },
+            data: { isDeleted: true, deletedAt: new Date() },
         });
 
         return NextResponse.json({
